@@ -179,14 +179,6 @@ public sealed partial class Lighting : Instance
 	private Color _fogColor;
 	private float _fogStartDistance;
 	private float _fogEndDistance;
-	private bool _volumetricFogEnabled;
-	private float _volumetricFogDensity;
-	private Color _volumetricFogLightColor;
-	private Color _volumetricFogAmbientColor;
-	private float _volumetricFogSkyImpact;
-	private float _volumetricFogDetailLength;
-	private float _volumetricFogLightingImpact;
-	private float _volumetricFogAnisotropy;
 
 	[Editable, ScriptProperty]
 	public AmbientSourceEnum AmbientSource
@@ -258,104 +250,6 @@ public sealed partial class Lighting : Instance
 		{
 			_fogEndDistance = value;
 			environment.FogDepthEnd = value;
-			OnPropertyChanged();
-		}
-	}
-
-	// Does not work on opengl
-	[Editable, ScriptProperty]
-	public bool VolumetricFogEnabled
-	{
-		get => _volumetricFogEnabled;
-		set
-		{
-			_volumetricFogEnabled = value;
-			environment.VolumetricFogEnabled = value;
-
-			OnPropertyChanged();
-		}
-	}
-
-	[Editable, ScriptProperty]
-	public float VolumetricFogDensity
-	{
-		get => _volumetricFogDensity;
-		set
-		{
-			_volumetricFogDensity = value;
-			environment.VolumetricFogDensity = value;
-
-			OnPropertyChanged();
-		}
-	}
-
-	[Editable, ScriptProperty]
-	public Color VolumetricFogLightColor
-	{
-		get => _volumetricFogLightColor;
-		set
-		{
-			_volumetricFogLightColor = value;
-			environment.VolumetricFogAlbedo = value;
-			OnPropertyChanged();
-		}
-	}
-
-	[Editable, ScriptProperty]
-	public Color VolumetricFogAmbientColor
-	{
-		get => _volumetricFogAmbientColor;
-		set
-		{
-			_volumetricFogAmbientColor = value;
-			environment.VolumetricFogEmission = value;
-			OnPropertyChanged();
-		}
-	}
-
-	[Editable, ScriptProperty]
-	public float VolumetricFogSkyImpact
-	{
-		get => _volumetricFogSkyImpact;
-		set
-		{
-			_volumetricFogSkyImpact = value;
-			environment.VolumetricFogSkyAffect = value;
-			OnPropertyChanged();
-		}
-	}
-	[Editable, ScriptProperty]
-	public float VolumetricFogLightingImpact
-	{
-		get => _volumetricFogLightingImpact;
-		set
-		{
-			_volumetricFogLightingImpact = value;
-			environment.VolumetricFogGIInject = value;
-			OnPropertyChanged();
-		}
-	}
-
-	[Editable, ScriptProperty]
-	public float VolumetricFogDetailLength
-	{
-		get => _volumetricFogDetailLength;
-		set
-		{
-			_volumetricFogDetailLength = value;
-			environment.VolumetricFogLength = value;
-			OnPropertyChanged();
-		}
-	}
-
-	[Editable, ScriptProperty]
-	public float VolumetricFogAnisotropy
-	{
-		get => _volumetricFogAnisotropy;
-		set
-		{
-			_volumetricFogAnisotropy = value;
-			environment.VolumetricFogAnisotropy = value;
 			OnPropertyChanged();
 		}
 	}
