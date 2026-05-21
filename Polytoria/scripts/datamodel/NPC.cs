@@ -16,7 +16,6 @@ namespace Polytoria.Datamodel;
 [Instantiable]
 public partial class NPC : Physical
 {
-	public override float SyncInterval { get; protected set; } = 0.05f;
 	private const float CoyoteTime = 0.15f;
 	private const float NavigationDistance = 1f;
 	public const float BodyRotateLerp = 10f;
@@ -59,8 +58,6 @@ public partial class NPC : Physical
 	private Color? _pendingLeftLegColor;
 	private Color? _pendingRightLegColor;
 	private int? _pendingFaceID;
-	private int? _pendingShirtID;
-	private int? _pendingPantsID;
 
 	protected override float PositionSyncThreshold => 0.1f;
 	protected override float RotationSyncThreshold => 1f;
@@ -70,19 +67,27 @@ public partial class NPC : Physical
 	{
 		get
 		{
-			return CharacterVelocity.Flip();
+			return CharacterVelocity;
 		}
 		set
 		{
 			if (this is Player plr)
 			{
 				plr.LastVelocity = value;
+				plr.ExternalVelocity = value;
 			}
 
-			CharacterVelocity = value.Flip();
+			CharacterVelocity = value;
 
 			OnPropertyChanged();
 		}
+	}
+
+	internal void ApplyInternalVelocity(Vector3 velocity)
+	{
+		UpdateVelocityInternal(velocity);
+		CharacterVelocity = velocity;
+		OnPropertyChanged(nameof(Velocity));
 	}
 
 
@@ -621,7 +626,7 @@ public partial class NPC : Physical
 		{
 			Vector3 velo = GetGlobalPosition().DirectionTo(walkTarget.Value with { Y = Position.Y });
 			CharacterVelocity = new(velo.X * WalkSpeed, CharacterVelocity.Y, velo.Z * WalkSpeed);
-			GDNode3D.GlobalRotationDegrees = new Vector3(Rotation.X, -Mathf.RadToDeg(Mathf.LerpAngle(Mathf.DegToRad(Rotation.Y), Mathf.Atan2(-CharacterVelocity.X, CharacterVelocity.Z), (float)(delta * BodyRotateLerp))), Rotation.Z);
+			GDNode3D.GlobalRotationDegrees = new Vector3(Rotation.X, Mathf.RadToDeg(Mathf.LerpAngle(Mathf.DegToRad(Rotation.Y), Mathf.Atan2(CharacterVelocity.X, CharacterVelocity.Z), MathUtils.ExpDecay((float)delta, BodyRotateLerp))), Rotation.Z);
 
 			float distanceToTarget = GetGlobalPosition().DistanceTo(walkTarget.Value);
 
@@ -668,7 +673,7 @@ public partial class NPC : Physical
 		UpdateVelocityInternal(CharacterVelocity);
 		if (this is not Player)
 		{
-			CharBody3D.Velocity = Velocity.Flip();
+			CharBody3D.Velocity = Velocity;
 			CharBody3D.MoveAndSlide();
 		}
 
@@ -706,9 +711,9 @@ public partial class NPC : Physical
 	[ScriptMethod]
 	public void Move(Vector3 velo)
 	{
-		CharacterVelocity = velo.Flip();
+		CharacterVelocity = velo;
 		UpdateVelocityInternal(CharacterVelocity);
-		CharBody3D.Velocity = Velocity.Flip();
+		CharBody3D.Velocity = Velocity;
 		CharBody3D.MoveAndSlide();
 	}
 
@@ -734,6 +739,10 @@ public partial class NPC : Physical
 		OverrideCanCollideTo = false;
 		Unsit(false);
 		UpdateCollision();
+
+		Character?.Animator?.StopAnimation();
+		Character?.Animator?.StopOneShotAnimation();
+
 		if (Character is PolytorianModel ptmodel)
 		{
 			ptmodel.StartRagdoll(Velocity);
@@ -810,7 +819,7 @@ public partial class NPC : Physical
 			{
 				From = origin,
 				To = origin + direction,
-				Exclude = new Array<Rid>() { CharBody3D.GetRid() },
+				Exclude = [CharBody3D.GetRid()],
 				CollideWithAreas = false,
 				CollideWithBodies = true,
 			});
@@ -1074,7 +1083,7 @@ public partial class NPC : Physical
 
 			_navAgent.NavigationFinished += OnNavFinished;
 		}
-		_navAgent.TargetPosition = pos.Flip();
+		_navAgent.TargetPosition = pos;
 	}
 
 	private void OnNavFinished()

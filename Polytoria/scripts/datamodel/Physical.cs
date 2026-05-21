@@ -7,7 +7,6 @@ using Polytoria.Attributes;
 using Polytoria.Networking;
 using Polytoria.Scripting;
 using Polytoria.Shared;
-using Polytoria.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +36,6 @@ public partial class Physical : Dynamic
 		public List<Node> CollisionSyncNodes { get; } = [];
 	}
 
-	public virtual float SyncInterval { get; protected set; } = 0.1f;
 	private const float TouchedGapCheck = 20f;
 	private bool _anchored = true;
 	private bool _canCollide = true;
@@ -50,8 +48,6 @@ public partial class Physical : Dynamic
 
 	private int _touchedListenerCount = 0;
 	private bool _canTouch = false;
-
-	private double _syncClock = 0;
 
 	private readonly Dictionary<Physical, int> _touchContacts = [];
 
@@ -186,6 +182,14 @@ public partial class Physical : Dynamic
 			// Stop collision override if player's not ready
 			if (this is Player plr && !plr.IsReady) { return; }
 			bool setTo = !_canCollide;
+
+#if CREATOR
+			if (Root != null && Root.SessionType == World.SessionTypeEnum.Creator)
+			{
+				setTo = false;
+			}
+#endif
+
 			SetCollisionDisabled(setTo);
 
 			if (setTo)
@@ -220,7 +224,7 @@ public partial class Physical : Dynamic
 		{
 			if (this is NPC npc)
 			{
-				return npc.CharacterVelocity.Flip();
+				return npc.CharacterVelocity;
 			}
 
 			return _velocity;
@@ -229,7 +233,7 @@ public partial class Physical : Dynamic
 		{
 			_velocity = value;
 
-			var setto = _velocity.Flip();
+			var setto = _velocity;
 
 			if (this is Player plr)
 			{
@@ -491,10 +495,7 @@ public partial class Physical : Dynamic
 			_canTouch = true;
 			PT.CallOnMainThread(() =>
 			{
-				if (PhysicalArea != null)
-				{
-					PhysicalArea.Monitoring = true;
-				}
+				PhysicalArea?.Monitoring = true;
 			});
 		}
 	}
@@ -506,10 +507,7 @@ public partial class Physical : Dynamic
 			_canTouch = false;
 			PT.CallOnMainThread(() =>
 			{
-				if (PhysicalArea != null)
-				{
-					PhysicalArea.Monitoring = false;
-				}
+				PhysicalArea?.Monitoring = false;
 			});
 		}
 	}
@@ -524,16 +522,10 @@ public partial class Physical : Dynamic
 		UpdateTransformTick(delta);
 		if (Root == null || Root?.Network == null) { return; }
 
-		_syncClock += delta;
-
 		// Sync if has authority and not anchored, if so. sync in interval
-		if (_syncClock > SyncInterval)
+		if (NetTransformAuthority == Root.Network.LocalPeerID && !Anchored)
 		{
-			_syncClock = 0;
-			if (NetTransformAuthority == Root.Network.LocalPeerID && !Anchored)
-			{
-				UpdateNetTransform();
-			}
+			UpdateNetTransform();
 		}
 		base.PhysicsProcess(delta);
 	}
@@ -841,7 +833,7 @@ public partial class Physical : Dynamic
 		return null;
 	}
 
-	public static Physical? GetPhysicalFromBodyShape(CollisionObject3D body, int shapeIndex)
+	public static Physical? GetPhysicalFromBodyShape(CollisionObject3D body)
 	{
 		if (_bodyToPhysical.TryGetValue(body, out Physical? val))
 			return val;
@@ -932,7 +924,7 @@ public partial class Physical : Dynamic
 		if (body is not CollisionObject3D collisionBody)
 			return;
 
-		Physical? p = GetPhysicalFromBodyShape(collisionBody, (int)bodyShapeIndex);
+		Physical? p = GetPhysicalFromBodyShape(collisionBody);
 		if (p != null)
 		{
 			InternalInvokeTouched(p);
@@ -944,7 +936,7 @@ public partial class Physical : Dynamic
 		if (body is not CollisionObject3D collisionBody)
 			return;
 
-		Physical? p = GetPhysicalFromBodyShape(collisionBody, (int)bodyShapeIndex);
+		Physical? p = GetPhysicalFromBodyShape(collisionBody);
 		if (p != null)
 		{
 			InternalInvokeTouchEnded(p);
@@ -1148,7 +1140,7 @@ public partial class Physical : Dynamic
 	[ScriptMethod]
 	public void AddForce(Vector3 force, ForceModeEnum mode = ForceModeEnum.Force)
 	{
-		ApplyAddForce(force.Flip(), mode);
+		ApplyAddForce(force, mode);
 	}
 
 	internal virtual void ApplyAddForce(Vector3 force, ForceModeEnum mode) { throw new NotImplementedException(ClassName + " does not support this force function"); }
@@ -1156,7 +1148,7 @@ public partial class Physical : Dynamic
 	[ScriptMethod]
 	public void AddTorque(Vector3 force, ForceModeEnum mode = ForceModeEnum.Force)
 	{
-		ApplyAddTorque(force.Flip(), mode);
+		ApplyAddTorque(force, mode);
 	}
 
 	internal virtual void ApplyAddTorque(Vector3 force, ForceModeEnum mode) { throw new NotImplementedException(ClassName + " does not support this force function"); }
@@ -1164,7 +1156,7 @@ public partial class Physical : Dynamic
 	[ScriptMethod]
 	public void AddForceAtPosition(Vector3 force, Vector3 position, ForceModeEnum mode = ForceModeEnum.Force)
 	{
-		ApplyAddForceAtPosition(force.Flip(), position.Flip(), mode);
+		ApplyAddForceAtPosition(force, position, mode);
 	}
 
 	internal virtual void ApplyAddForceAtPosition(Vector3 force, Vector3 position, ForceModeEnum mode) { throw new NotImplementedException(ClassName + " does not support this force function"); }
@@ -1172,7 +1164,7 @@ public partial class Physical : Dynamic
 	[ScriptMethod]
 	public void AddRelativeForce(Vector3 force, ForceModeEnum mode = ForceModeEnum.Force)
 	{
-		ApplyAddRelativeForce(force.Flip(), mode);
+		ApplyAddRelativeForce(force, mode);
 	}
 
 	internal virtual void ApplyAddRelativeForce(Vector3 force, ForceModeEnum mode) { throw new NotImplementedException(ClassName + " does not support this force function"); }
@@ -1180,11 +1172,12 @@ public partial class Physical : Dynamic
 	[ScriptMethod]
 	public void AddRelativeTorque(Vector3 torque, ForceModeEnum mode = ForceModeEnum.Force)
 	{
-		ApplyAddRelativeTorque(torque.Flip(), mode);
+		ApplyAddRelativeTorque(torque, mode);
 	}
 
 	internal virtual void ApplyAddRelativeTorque(Vector3 torque, ForceModeEnum mode) { throw new NotImplementedException(ClassName + " does not support this force function"); }
 
+	[ScriptEnum("ForceMode")]
 	public enum ForceModeEnum
 	{
 		Force,

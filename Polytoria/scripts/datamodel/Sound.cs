@@ -8,6 +8,10 @@ using Polytoria.Datamodel.Resources;
 using Polytoria.Networking;
 using Polytoria.Scripting;
 
+#if CREATOR
+using Polytoria.Creator.Spatial;
+#endif
+
 namespace Polytoria.Datamodel;
 
 [Instantiable]
@@ -204,6 +208,9 @@ public sealed partial class Sound : Dynamic
 	public override void Init()
 	{
 		CreateAudioPlayer();
+#if CREATOR
+		GDNode.AddChild(new SpatialIcon(ClassName), @internal: Node.InternalMode.Back);
+#endif
 		base.Init();
 	}
 
@@ -245,15 +252,8 @@ public sealed partial class Sound : Dynamic
 
 	private void CleanupAudioPlayer()
 	{
-		if (_audioPlayer != null)
-		{
-			_audioPlayer.Finished -= OnPlayerFinished;
-		}
-
-		if (_audioPlayer3D != null)
-		{
-			_audioPlayer3D.Finished -= OnPlayerFinished;
-		}
+		_audioPlayer?.Finished -= OnPlayerFinished;
+		_audioPlayer3D?.Finished -= OnPlayerFinished;
 
 		_audioPlayer = null;
 		_audioPlayer3D = null;

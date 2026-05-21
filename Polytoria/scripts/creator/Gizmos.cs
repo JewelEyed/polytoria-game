@@ -24,6 +24,9 @@ public sealed partial class Gizmos : Node
 	private float _gizmoScale;
 	private bool _isMouseDragging;
 	private bool _isDraggingDyn;
+	private bool _isDragPending;
+	private Vector2 _dragStartPos;
+	private const float DragThreshold = 8f;
 	private Dynamic? _lastHovered;
 	private SelectionBox _paintBox = null!;
 	private SelectionBox _hoverBox = null!;
@@ -285,7 +288,7 @@ public sealed partial class Gizmos : Node
 		{
 			if (_dragStartOffsets.TryGetValue(item, out Vector3 offset))
 			{
-				item.Position = ((vector.Snap(CreatorService.Interface.MoveSnapping)) * new Vector3(-1, 1, 1)) + offset;
+				item.Position = vector.Snap(CreatorService.Interface.MoveSnapping) + offset;
 			}
 		}
 	}
@@ -430,15 +433,24 @@ public sealed partial class Gizmos : Node
 
 		PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(rayOrigin, rayNormal);
 		query.CollideWithAreas = true;
-		query.CollideWithBodies = false;
-		query.CollisionMask = (1 << 2) | (1 << 3);
+		query.CollideWithBodies = true;
+		query.CollisionMask = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3);
 
 		Godot.Collections.Dictionary? intersection = Root.World3D.DirectSpaceState.IntersectRay(query);
 
 		Dynamic? hoveringOn = null;
 		if (intersection.Count > 0)
 		{
-			hoveringOn = Dynamic.GetDynFromCreatorBounds((Node)intersection["collider"]);
+			Node collider = (Node)intersection["collider"];
+			hoveringOn = Dynamic.GetDynFromCreatorBounds(collider);
+			if (hoveringOn == null && collider is CollisionObject3D colObj)
+			{
+				hoveringOn = Physical.GetPhysicalFromBody(colObj);
+				if (hoveringOn == null)
+				{
+					hoveringOn = Physical.GetPhysicalFromCollider(collider);
+				}
+			}
 		}
 
 		if (toolMode == ToolModeEnum.Paint)
@@ -492,13 +504,14 @@ public sealed partial class Gizmos : Node
 			if (button.Pressed)
 			{
 				_isMouseDragging = true;
+				_dragStartPos = button.Position;
 			}
 			else
 			{
 				_isMouseDragging = false;
+				_isDragPending = false;
 				if (_isDraggingDyn)
 				{
-					// Stopped dragging
 					_isDraggingDyn = false;
 					CommitHistorySelectedTransform();
 				}
@@ -550,14 +563,7 @@ public sealed partial class Gizmos : Node
 					if (toolMode == ToolModeEnum.Select)
 					{
 						DragSelected.Add(targetDyn);
-
-						if (!_isDraggingDyn)
-						{
-							// Drag started
-							_isDraggingDyn = true;
-							_history.NewAction("Select Drag Transform");
-							RecordHistoryUndo();
-						}
+						_isDragPending = true;
 					}
 				}
 			}
@@ -569,8 +575,20 @@ public sealed partial class Gizmos : Node
 				}
 			}
 		}
-		else if (@event is InputEventMouseMotion)
+		else if (@event is InputEventMouseMotion motion)
 		{
+			if (_isDragPending && !_isDraggingDyn)
+			{
+				float distance = motion.Position.DistanceTo(_dragStartPos);
+				if (distance >= DragThreshold)
+				{
+					_isDraggingDyn = true;
+					_isDragPending = false;
+					_history.NewAction("Select Drag Transform");
+					RecordHistoryUndo();
+				}
+			}
+
 			if (_isDraggingDyn)
 			{
 				DragSelectedDynamics();
@@ -677,9 +695,9 @@ public sealed partial class Gizmos : Node
 		Vector3 rayNormal = rayOrigin + _camera.ProjectRayNormal(mousePos) * 1000;
 
 		PhysicsRayQueryParameters3D query = PhysicsRayQueryParameters3D.Create(rayOrigin, rayNormal);
-		query.CollideWithBodies = false;
+		query.CollideWithBodies = true;
 		query.CollideWithAreas = true;
-		query.CollisionMask = 1 << 3;
+		query.CollisionMask = (1 << 0) | (1 << 1) | (1 << 3);
 
 		Godot.Collections.Array<Rid> excludeArray = [];
 
