@@ -78,10 +78,11 @@ _data = {
 [node name="InteractionPrompt" type="Node3D" unique_id=1790485309]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1654419761]
-pixel_size = 0.0007
+pixel_size = 0.002
 billboard = 1
 no_depth_test = true
-fixed_size = true
+alpha_antialiasing_mode = 1
+alpha_antialiasing_edge = 0.2
 texture = SubResource("ViewportTexture_3o1ik")
 
 [node name="VOSN" type="VisibleOnScreenNotifier3D" parent="." unique_id=1375608347]
