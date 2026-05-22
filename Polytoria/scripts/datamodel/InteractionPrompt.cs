@@ -2,6 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+using System.Collections.Generic;
 using Godot;
 using Polytoria.Attributes;
 using Polytoria.Networking;
@@ -24,10 +25,18 @@ public sealed partial class InteractionPrompt : Physical
 	private float _losThreshold = 0.5f;
 	private float _activationTime = 0.5f;
 	private string _title = "Interact";
-	private string _subtitle = "Subtitle";
+	private string _subtitle = "[color=#a3a3a3]Subtitle[/color]";
+	private Color _backgroundColor = new("#000000f1");
+
+	private float _scale = 1f;
+
+	private RichTextLabel _titleNode = null!;
+	private RichTextLabel _subtitleNode = null!;
 
 
+	private StyleBoxFlat _styleBox = null!;
 
+	private int _cornerRadius = 0;
 
 	private bool _useParentForVisibility = false;
 
@@ -38,6 +47,10 @@ public sealed partial class InteractionPrompt : Physical
 	private bool _inRange = false;
 	private bool _isMouseOverParent = false;
 	private float _timeSpentActivating = 0.0f;
+
+	private List<Player> _hiddenFor = [];
+
+	private bool _hideByDefault = false;
 
 
 	[Editable, ScriptProperty, DefaultValue(true)]
@@ -51,6 +64,17 @@ public sealed partial class InteractionPrompt : Physical
 		}
 	}
 
+	[Editable, ScriptProperty]
+	public bool HideByDefault
+	{
+		get => _hideByDefault;
+		set
+		{
+			_hideByDefault = value;
+			OnPropertyChanged();
+		}
+	}
+
 	[Editable, ScriptProperty, DefaultValue("Interact")]
 	public string Title
 	{
@@ -58,19 +82,61 @@ public sealed partial class InteractionPrompt : Physical
 		set
 		{
 			_title = value;
-			_prompt.GetNode<Label>("SV/Control/Pivot/Text/Layout/Title").Text = _title;
+			_titleNode.Text = _title;
 			OnPropertyChanged();
 		}
 	}
 
-	[Editable, ScriptProperty, DefaultValue("Subtitle")]
+
+	[Editable, ScriptProperty, DefaultValue("[color=#a3a3a3]Subtitle[/color]")]
 	public string Subtitle
 	{
 		get => _subtitle;
 		set
 		{
 			_subtitle = value;
-			_prompt.GetNode<Label>("SV/Control/Pivot/Text/Layout/SubTitle").Text = _subtitle;
+			_subtitleNode.Text = _subtitle;
+			OnPropertyChanged();
+		}
+	}
+
+	[Editable, ScriptProperty]
+	public Color BackgroundColor
+	{
+		get => _backgroundColor;
+		set
+		{
+			_backgroundColor = value;
+			_styleBox.BgColor = _backgroundColor;
+			OnPropertyChanged();
+		}
+	}
+
+
+	[Editable, ScriptProperty, DefaultValue(0)]
+	public int CornerRadius
+	{
+		get => _cornerRadius;
+		set
+		{
+			_cornerRadius = value;
+			_styleBox.CornerRadiusBottomLeft = _cornerRadius;
+			_styleBox.CornerRadiusBottomRight = _cornerRadius;
+			_styleBox.CornerRadiusTopLeft = _cornerRadius;
+			_styleBox.CornerRadiusTopRight = _cornerRadius;
+
+			OnPropertyChanged();
+		}
+	}
+
+	[Editable, ScriptProperty, DefaultValue(1f)]
+	public float Scale
+	{
+		get => _scale;
+		set
+		{
+			_scale = value;
+			_prompt.Scale = new Vector3(_scale, _scale, _scale);
 			OnPropertyChanged();
 		}
 	}
@@ -132,6 +198,19 @@ public sealed partial class InteractionPrompt : Physical
 		}
 	}
 
+
+	[ScriptProperty]
+	public Player[] HiddenFor
+	{
+		get => _hiddenFor.ToArray();
+		set
+		{
+			_hiddenFor = [.. value];
+			OnPropertyChanged();
+		}
+	}
+
+
 	public bool CheckCanInteract()
 	{
 		if (_inRange)
@@ -150,10 +229,11 @@ public sealed partial class InteractionPrompt : Physical
 
 	public bool IsFacingPrompt()
 	{
-		if (Root.Environment.CurrentCamera == null) {
+		if (Root.Environment.CurrentCamera == null)
+		{
 			return false;
 		}
-		var playerTransform = Root.Environment.CurrentCamera.GetGlobalTransform(); 
+		var playerTransform = Root.Environment.CurrentCamera.GetGlobalTransform();
 		var targetF = -playerTransform.Basis.Z;
 		var direction = (_prompt.GlobalTransform.Origin - playerTransform.Origin).Normalized();
 		return targetF.Dot(direction) >= _losThreshold;
@@ -189,19 +269,33 @@ public sealed partial class InteractionPrompt : Physical
 		base.ExitTree();
 	}
 
-	public override Node CreateGDNode() {
+	public override Node CreateGDNode()
+	{
 		_prompt = Globals.CreateInstanceFromScene<Node3D>(PromptScenePath);
 		_animPlayer = _prompt.GetNode<AnimationPlayer>("AnimPlay");
-		_progressBar = _prompt.GetNode<TextureProgressBar>("SV/Control/Pivot/Key/TextureProgressBar");
+		_progressBar = _prompt.GetNode<TextureProgressBar>("SV/CenterContainer/Panel/HBoxContainer/Key/TextureProgressBar");
 		return _prompt;
 	}
 
 	public override void Init()
 	{
-		base.Init();
+		_styleBox = new()
+		{
+			CornerRadiusBottomLeft = _cornerRadius,
+			CornerRadiusBottomRight = _cornerRadius,
+			CornerRadiusTopLeft = _cornerRadius,
+			CornerRadiusTopRight = _cornerRadius,
+			AntiAliasing = true,
+			AntiAliasingSize = 1,
+			BgColor = _backgroundColor
+		};
+		var panel = _prompt.GetNode<PanelContainer>("SV/CenterContainer/Panel");
+		_titleNode = _prompt.GetNode<RichTextLabel>("SV/CenterContainer/Panel/HBoxContainer/Layout/Title");
+		_subtitleNode = _prompt.GetNode<RichTextLabel>("SV/CenterContainer/Panel/HBoxContainer/Layout/Subtitle");
+		panel.AddThemeStyleboxOverride("panel", _styleBox);
 		SetProcess(true);
+		base.Init();
 	}
-
 
 	public override void Process(double delta)
 	{
@@ -227,10 +321,11 @@ public sealed partial class InteractionPrompt : Physical
 
 		if (Input.IsActionPressed("interact"))
 		{
-			
+
 			if (CheckCanInteract() && _enabled)
 			{
-				if (_timeSpentActivating == 0.0f) {
+				if (_timeSpentActivating == 0.0f)
+				{
 					_animPlayer.Play("InputStart");
 				}
 				_timeSpentActivating += (float)delta;
@@ -242,11 +337,12 @@ public sealed partial class InteractionPrompt : Physical
 				Interacted.Invoke(Root.Players.LocalPlayer);
 				RpcId(1, nameof(TriggerInteracted));
 			}
-			
+
 		}
 		else
 		{
-			if (_timeSpentActivating > 0.0f) {
+			if (_timeSpentActivating > 0.0f)
+			{
 				_timeSpentActivating = 0.0f;
 				_animPlayer.Play("InputEnd");
 			}
@@ -255,11 +351,40 @@ public sealed partial class InteractionPrompt : Physical
 		_progressBar.Value = (_timeSpentActivating / _activationTime) * 100f;
 		base.PhysicsProcess(delta);
 	}
-	
+
+	[ScriptMethod]
+	public void HideFor(Player plr) {
+		_hiddenFor.Add(plr);
+		RpcId(plr.PeerID, nameof(HideRPC));
+	}
+
+	[ScriptMethod]
+	public void ShowFor(Player plr) {
+		_hiddenFor.Remove(plr);
+		RpcId(plr.PeerID, nameof(ShowRPC));
+	}
+
+
+	[NetRpc(AuthorityMode.Authority, TransferMode = TransferMode.Reliable)]
+	private void HideRPC()
+	{
+		_prompt.Visible = false;
+	}
+
+	[NetRpc(AuthorityMode.Authority, TransferMode = TransferMode.Reliable)]
+	private void ShowRPC()
+	{
+		_prompt.Visible = true;
+	}
+
+
+
 	[NetRpc(AuthorityMode.Any, TransferMode = TransferMode.Reliable)]
-	private void TriggerInteracted() {
+	private void TriggerInteracted()
+	{
 		Player? p = Root.Players.GetPlayerFromPeerID(RemoteSenderId);
-		if (p == null) {
+		if (p == null)
+		{
 			return;
 		}
 		Interacted.Invoke(p);
