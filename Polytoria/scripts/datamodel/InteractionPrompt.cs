@@ -2,6 +2,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+using System;
 using System.Collections.Generic;
 using Godot;
 using Polytoria.Attributes;
@@ -19,6 +20,8 @@ public sealed partial class InteractionPrompt : Physical
 
 	private Physical? _parent = null!;
 
+	private bool _hiddenByServer = false;
+
 	private bool _enabled = true;
 	private float _maxDistance = 10.0f;
 	private bool _requireFacing = true;
@@ -27,6 +30,7 @@ public sealed partial class InteractionPrompt : Physical
 	private string _title = "Interact";
 	private string _subtitle = "[color=#a3a3a3]Subtitle[/color]";
 	private Color _backgroundColor = new("#000000f1");
+
 
 	private float _scale = 1f;
 
@@ -71,6 +75,7 @@ public sealed partial class InteractionPrompt : Physical
 		set
 		{
 			_hideByDefault = value;
+			_hiddenByServer = _hideByDefault;
 			OnPropertyChanged();
 		}
 	}
@@ -213,6 +218,9 @@ public sealed partial class InteractionPrompt : Physical
 
 	public bool CheckCanInteract()
 	{
+		if (_hiddenByServer) {
+			return false;
+		}
 		if (_inRange)
 		{
 			if (_requireFacing)
@@ -304,7 +312,7 @@ public sealed partial class InteractionPrompt : Physical
 		var distance = Root.Players.LocalPlayer?.GetGlobalPosition().DistanceTo(GetGlobalPosition());
 		_inRange = distance <= _maxDistance;
 		_prompt.Visible = false;
-		if (_inRange && _enabled)
+		if (_inRange && _enabled && !_hiddenByServer)
 		{
 			if (_useParentForVisibility)
 			{
@@ -319,9 +327,14 @@ public sealed partial class InteractionPrompt : Physical
 			}
 		}
 
+		base.Process(delta);
+
+		if (_hiddenByServer) {
+			return;
+		}
+
 		if (Input.IsActionPressed("interact"))
 		{
-
 			if (CheckCanInteract() && _enabled)
 			{
 				if (_timeSpentActivating == 0.0f)
@@ -336,8 +349,14 @@ public sealed partial class InteractionPrompt : Physical
 				_animPlayer.Play("InputEnd");
 				Interacted.Invoke(Root.Players.LocalPlayer);
 				RpcId(1, nameof(TriggerInteracted));
+				if (_activationTime <= 0.1) {
+					// Kind-of weird, silly solution, but this prevents the server from being spammed with requests from a client if the activation time is instant
+					// Hate it? Blame JewelEyed <3
+					if (Root.Players.LocalPlayer != null) {
+						_timeSpentActivating = -Math.Max((Root.Players.LocalPlayer.NetworkPing / 1000f), 0.1f);
+					}
+				}
 			}
-
 		}
 		else
 		{
@@ -349,7 +368,6 @@ public sealed partial class InteractionPrompt : Physical
 
 		}
 		_progressBar.Value = (_timeSpentActivating / _activationTime) * 100f;
-		base.PhysicsProcess(delta);
 	}
 
 	[ScriptMethod]
@@ -369,15 +387,14 @@ public sealed partial class InteractionPrompt : Physical
 	private void HideRPC()
 	{
 		_prompt.Visible = false;
+		_hiddenByServer = true;
 	}
 
 	[NetRpc(AuthorityMode.Authority, TransferMode = TransferMode.Reliable)]
 	private void ShowRPC()
 	{
-		_prompt.Visible = true;
+		_hiddenByServer = false;
 	}
-
-
 
 	[NetRpc(AuthorityMode.Any, TransferMode = TransferMode.Reliable)]
 	private void TriggerInteracted()
@@ -386,6 +403,9 @@ public sealed partial class InteractionPrompt : Physical
 		if (p == null)
 		{
 			return;
+		}
+		if (_hiddenFor.Contains(p)) {
+			return; // kinda sus
 		}
 		Interacted.Invoke(p);
 	}
