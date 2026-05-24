@@ -40,7 +40,7 @@ public sealed partial class InteractionPrompt : Physical
 
 	private StyleBoxFlat _styleBox = null!;
 
-	private int _cornerRadius = 0;
+	private int _cornerRadius = 36;
 
 	private bool _useParentForVisibility = false;
 
@@ -118,7 +118,7 @@ public sealed partial class InteractionPrompt : Physical
 	}
 
 
-	[Editable, ScriptProperty, DefaultValue(0)]
+	[Editable, ScriptProperty, DefaultValue(36)]
 	public int CornerRadius
 	{
 		get => _cornerRadius;
@@ -218,7 +218,8 @@ public sealed partial class InteractionPrompt : Physical
 
 	public bool CheckCanInteract()
 	{
-		if (_hiddenByServer) {
+		if (_hiddenByServer)
+		{
 			return false;
 		}
 		if (_inRange)
@@ -301,8 +302,8 @@ public sealed partial class InteractionPrompt : Physical
 		_titleNode = _prompt.GetNode<RichTextLabel>("SV/CenterContainer/Panel/HBoxContainer/Layout/Title");
 		_subtitleNode = _prompt.GetNode<RichTextLabel>("SV/CenterContainer/Panel/HBoxContainer/Layout/Subtitle");
 		panel.AddThemeStyleboxOverride("panel", _styleBox);
-		SetProcess(true);
 		base.Init();
+		SetProcess(true); // played around with this alot, process seems to work better in general I've found
 	}
 
 	public override void Process(double delta)
@@ -327,9 +328,10 @@ public sealed partial class InteractionPrompt : Physical
 			}
 		}
 
-		base.Process(delta);
+		base.PhysicsProcess(delta);
 
-		if (_hiddenByServer) {
+		if (_hiddenByServer)
+		{
 			return;
 		}
 
@@ -349,10 +351,12 @@ public sealed partial class InteractionPrompt : Physical
 				_animPlayer.Play("InputEnd");
 				Interacted.Invoke(Root.Players.LocalPlayer);
 				RpcId(1, nameof(TriggerInteracted));
-				if (_activationTime <= 0.1) {
+				if (_activationTime <= 0.1)
+				{
 					// Kind-of weird, silly solution, but this prevents the server from being spammed with requests from a client if the activation time is instant
 					// Hate it? Blame JewelEyed <3
-					if (Root.Players.LocalPlayer != null) {
+					if (Root.Players.LocalPlayer != null)
+					{
 						_timeSpentActivating = -Math.Max((Root.Players.LocalPlayer.NetworkPing / 1000f), 0.1f);
 					}
 				}
@@ -371,13 +375,15 @@ public sealed partial class InteractionPrompt : Physical
 	}
 
 	[ScriptMethod]
-	public void HideFor(Player plr) {
+	public void HideFor(Player plr)
+	{
 		_hiddenFor.Add(plr);
 		RpcId(plr.PeerID, nameof(HideRPC));
 	}
 
 	[ScriptMethod]
-	public void ShowFor(Player plr) {
+	public void ShowFor(Player plr)
+	{
 		_hiddenFor.Remove(plr);
 		RpcId(plr.PeerID, nameof(ShowRPC));
 	}
@@ -404,7 +410,8 @@ public sealed partial class InteractionPrompt : Physical
 		{
 			return;
 		}
-		if (_hiddenFor.Contains(p)) {
+		if (_hiddenFor.Contains(p))
+		{
 			return; // kinda sus
 		}
 		Interacted.Invoke(p);
