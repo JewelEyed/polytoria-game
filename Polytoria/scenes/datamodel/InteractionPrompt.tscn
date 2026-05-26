@@ -1,5 +1,6 @@
-[gd_scene format=3 uid="uid://bhayyrm6rpiqw"]
+[gd_scene format=3 uid="uid://c5p735m7cvwj6"]
 
+[ext_resource type="Texture2D" uid="uid://bm5ffsr0tppo2" path="res://assets/textures/client/prompt/blurbg.png" id="1_r0wmh"]
 [ext_resource type="Texture2D" uid="uid://buu6g2ioxa33" path="res://assets/textures/client/prompt/button.png" id="2"]
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_3o1ik"]
@@ -14,7 +15,7 @@ length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("SV/CenterContainer/Panel/HBoxContainer/Key/TextureRect2:scale")
+tracks/0/path = NodePath("SV/Control/Pivot/Key/TextureRect2:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -30,7 +31,7 @@ length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("SV/CenterContainer/Panel/HBoxContainer/Key/TextureRect2:scale")
+tracks/0/path = NodePath("SV/Control/Pivot/Key/TextureRect2:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -45,7 +46,7 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("SV/CenterContainer/Panel/HBoxContainer/Key/TextureProgressBar:value")
+tracks/0/path = NodePath("SV/Control/Pivot/Key/TextureProgressBar:value")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -57,7 +58,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SV/CenterContainer/Panel/HBoxContainer/Key/TextureRect2:scale")
+tracks/1/path = NodePath("SV/Control/Pivot/Key/TextureRect2:scale")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -77,11 +78,9 @@ _data = {
 [node name="InteractionPrompt" type="Node3D" unique_id=1790485309]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1654419761]
-pixel_size = 0.0023
+pixel_size = 0.002
 billboard = 1
 no_depth_test = true
-alpha_antialiasing_mode = 1
-alpha_antialiasing_edge = 0.2
 texture = SubResource("ViewportTexture_3o1ik")
 
 [node name="VOSN" type="VisibleOnScreenNotifier3D" parent="." unique_id=1375608347]
@@ -90,29 +89,46 @@ aabb = AABB(-0.05, -0.05, -0.05, 0.1, 0.1, 0.1)
 [node name="SV" type="SubViewport" parent="." unique_id=763647456]
 disable_3d = true
 transparent_bg = true
-size = Vector2i(1000, 292)
+size = Vector2i(500, 550)
 
-[node name="CenterContainer" type="CenterContainer" parent="SV" unique_id=934695817]
+[node name="Control" type="Control" parent="SV" unique_id=374913778]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 500.0
+offset_bottom = 550.0
+
+[node name="TextureRect" type="TextureRect" parent="SV/Control" unique_id=1646624192]
+layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("1_r0wmh")
 
-[node name="Panel" type="PanelContainer" parent="SV/CenterContainer" unique_id=716894897]
-custom_minimum_size = Vector2(524, 200)
-layout_mode = 2
-size_flags_horizontal = 4
+[node name="Pivot" type="Control" parent="SV/Control" unique_id=1144668039]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="SV/CenterContainer/Panel" unique_id=1997936055]
-custom_minimum_size = Vector2(524, 200)
-layout_mode = 2
+[node name="Key" type="Control" parent="SV/Control/Pivot" unique_id=1789410328]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -48.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Key" type="Control" parent="SV/CenterContainer/Panel/HBoxContainer" unique_id=1789410328]
-custom_minimum_size = Vector2(200, 176)
-layout_mode = 2
-
-[node name="TextureProgressBar" type="TextureProgressBar" parent="SV/CenterContainer/Panel/HBoxContainer/Key" unique_id=1456371195]
+[node name="TextureProgressBar" type="TextureProgressBar" parent="SV/Control/Pivot/Key" unique_id=1456371195]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -120,9 +136,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -73.0
-offset_top = -73.0
+offset_top = -78.5
 offset_right = 73.0
-offset_bottom = 73.0
+offset_bottom = 67.5
 grow_horizontal = 2
 grow_vertical = 2
 fill_mode = 3
@@ -130,16 +146,16 @@ radial_initial_angle = 180.0
 texture_progress = SubResource("CompressedTexture2D_r0wmh")
 tint_progress = Color(0.5132329, 0.5132329, 0.5132329, 0.6392157)
 
-[node name="TextureRect2" type="TextureRect" parent="SV/CenterContainer/Panel/HBoxContainer/Key" unique_id=2131272928]
+[node name="TextureRect2" type="TextureRect" parent="SV/Control/Pivot/Key" unique_id=2131272928]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -83.0
+offset_left = -82.0
 offset_top = -88.0
-offset_right = 83.0
+offset_right = 84.0
 offset_bottom = 88.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -148,17 +164,17 @@ texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="KeyLabel" type="Label" parent="SV/CenterContainer/Panel/HBoxContainer/Key" unique_id=207891453]
+[node name="KeyLabel" type="Label" parent="SV/Control/Pivot/Key" unique_id=207891453]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -28.0
-offset_top = -52.0
-offset_right = 28.0
-offset_bottom = 52.0
+offset_left = -20.0
+offset_top = -10.5
+offset_right = 20.0
+offset_bottom = 10.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 84
@@ -166,41 +182,46 @@ text = "E"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Layout" type="VBoxContainer" parent="SV/CenterContainer/Panel/HBoxContainer" unique_id=764497722]
-layout_mode = 2
-size_flags_horizontal = 3
-alignment = 1
+[node name="Text" type="Control" parent="SV/Control/Pivot" unique_id=1420595244]
+anchors_preset = 0
+offset_top = 82.0
+offset_bottom = 82.0
 
-[node name="Title" type="RichTextLabel" parent="SV/CenterContainer/Panel/HBoxContainer/Layout" unique_id=1031454613]
+[node name="Layout" type="VBoxContainer" parent="SV/Control/Pivot/Text" unique_id=764497722]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -0.5
+offset_right = 0.5
+offset_bottom = 21.0
+grow_horizontal = 2
+
+[node name="Title" type="RichTextLabel" parent="SV/Control/Pivot/Text/Layout" unique_id=2072620094]
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-theme_override_font_sizes/normal_font_size = 52
-theme_override_font_sizes/bold_font_size = 52
-theme_override_font_sizes/bold_italics_font_size = 52
-theme_override_font_sizes/italics_font_size = 52
-theme_override_font_sizes/mono_font_size = 52
+theme_override_font_sizes/normal_font_size = 48
+theme_override_font_sizes/bold_font_size = 48
+theme_override_font_sizes/bold_italics_font_size = 48
+theme_override_font_sizes/italics_font_size = 48
+theme_override_font_sizes/mono_font_size = 48
 bbcode_enabled = true
-text = "Interact"
+text = "Title"
 fit_content = true
-scroll_active = false
-autowrap_mode = 0
+horizontal_alignment = 1
 
-[node name="Subtitle" type="RichTextLabel" parent="SV/CenterContainer/Panel/HBoxContainer/Layout" unique_id=387933077]
+[node name="Subtitle" type="RichTextLabel" parent="SV/Control/Pivot/Text/Layout" unique_id=669893816]
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
-theme_override_font_sizes/normal_font_size = 24
-theme_override_font_sizes/bold_font_size = 24
-theme_override_font_sizes/bold_italics_font_size = 24
-theme_override_font_sizes/italics_font_size = 24
-theme_override_font_sizes/mono_font_size = 24
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+theme_override_font_sizes/bold_italics_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/mono_font_size = 32
 bbcode_enabled = true
-text = "Please :3"
+text = "[color=#a3a3a3]Subtitle[/color]"
 fit_content = true
-scroll_active = false
-
-[node name="Control" type="Control" parent="SV/CenterContainer/Panel/HBoxContainer" unique_id=920076967]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
+horizontal_alignment = 1
 
 [node name="AnimPlay" type="AnimationPlayer" parent="." unique_id=289240261]
 libraries/ = SubResource("AnimationLibrary_mg4e6")

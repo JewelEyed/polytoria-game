@@ -29,7 +29,6 @@ public sealed partial class InteractionPrompt : Physical
 	private float _activationTime = 0.5f;
 	private string _title = "Interact";
 	private string _subtitle = "[color=#a3a3a3]Subtitle[/color]";
-	private Color _backgroundColor = new("#000000f1");
 
 
 	private float _scale = 1f;
@@ -37,16 +36,13 @@ public sealed partial class InteractionPrompt : Physical
 	private RichTextLabel _titleNode = null!;
 	private RichTextLabel _subtitleNode = null!;
 
-
-	private StyleBoxFlat _styleBox = null!;
-
-	private int _cornerRadius = 36;
-
 	private bool _useParentForVisibility = false;
 
 	private Node3D _prompt = null!;
 	private AnimationPlayer _animPlayer = null!;
 	private TextureProgressBar _progressBar = null!;
+
+	private float _progress = 0.0f;
 
 	private bool _inRange = false;
 	private bool _isMouseOverParent = false;
@@ -55,6 +51,28 @@ public sealed partial class InteractionPrompt : Physical
 	private List<Player> _hiddenFor = [];
 
 	private bool _hideByDefault = false;
+
+	private UIModeEnum _uiMode = UIModeEnum.Default;
+
+	private List<GUI3D> _gui3Ds = new();
+
+	[Editable, ScriptProperty]
+	public UIModeEnum UIMode 
+	{
+		get => _uiMode;
+		set
+		{
+			_uiMode = value;
+			_prompt.GetNode<Sprite3D>("Sprite3D").Visible = _uiMode == UIModeEnum.Default;
+			_gui3Ds.Clear();
+			foreach (var child in GetChildren()) {
+				if (child is GUI3D) {
+					_gui3Ds.Add((GUI3D)child);
+				}
+			}
+			OnPropertyChanged();
+		}
+	}
 
 
 	[Editable, ScriptProperty, DefaultValue(true)]
@@ -101,35 +119,6 @@ public sealed partial class InteractionPrompt : Physical
 		{
 			_subtitle = value;
 			_subtitleNode.Text = _subtitle;
-			OnPropertyChanged();
-		}
-	}
-
-	[Editable, ScriptProperty]
-	public Color BackgroundColor
-	{
-		get => _backgroundColor;
-		set
-		{
-			_backgroundColor = value;
-			_styleBox.BgColor = _backgroundColor;
-			OnPropertyChanged();
-		}
-	}
-
-
-	[Editable, ScriptProperty, DefaultValue(36)]
-	public int CornerRadius
-	{
-		get => _cornerRadius;
-		set
-		{
-			_cornerRadius = value;
-			_styleBox.CornerRadiusBottomLeft = _cornerRadius;
-			_styleBox.CornerRadiusBottomRight = _cornerRadius;
-			_styleBox.CornerRadiusTopLeft = _cornerRadius;
-			_styleBox.CornerRadiusTopRight = _cornerRadius;
-
 			OnPropertyChanged();
 		}
 	}
@@ -215,6 +204,17 @@ public sealed partial class InteractionPrompt : Physical
 		}
 	}
 
+	[ScriptProperty, NoSync]
+	public float Progress
+	{
+		get => _progress;
+		set
+		{
+			_progress = value;
+			//OnPropertyChanged();
+		}
+	}
+
 
 	public bool CheckCanInteract()
 	{
@@ -282,26 +282,14 @@ public sealed partial class InteractionPrompt : Physical
 	{
 		_prompt = Globals.CreateInstanceFromScene<Node3D>(PromptScenePath);
 		_animPlayer = _prompt.GetNode<AnimationPlayer>("AnimPlay");
-		_progressBar = _prompt.GetNode<TextureProgressBar>("SV/CenterContainer/Panel/HBoxContainer/Key/TextureProgressBar");
+		_progressBar = _prompt.GetNode<TextureProgressBar>("SV/Control/Pivot/Key/TextureProgressBar");
 		return _prompt;
 	}
 
 	public override void Init()
 	{
-		_styleBox = new()
-		{
-			CornerRadiusBottomLeft = _cornerRadius,
-			CornerRadiusBottomRight = _cornerRadius,
-			CornerRadiusTopLeft = _cornerRadius,
-			CornerRadiusTopRight = _cornerRadius,
-			AntiAliasing = true,
-			AntiAliasingSize = 1,
-			BgColor = _backgroundColor
-		};
-		var panel = _prompt.GetNode<PanelContainer>("SV/CenterContainer/Panel");
-		_titleNode = _prompt.GetNode<RichTextLabel>("SV/CenterContainer/Panel/HBoxContainer/Layout/Title");
-		_subtitleNode = _prompt.GetNode<RichTextLabel>("SV/CenterContainer/Panel/HBoxContainer/Layout/Subtitle");
-		panel.AddThemeStyleboxOverride("panel", _styleBox);
+		_titleNode = _prompt.GetNode<RichTextLabel>("SV/Control/Pivot/Text/Layout/Title");
+		_subtitleNode = _prompt.GetNode<RichTextLabel>("SV/Control/Pivot/Text/Layout/Subtitle");
 		base.Init();
 		SetProcess(true); // played around with this alot, process seems to work better in general I've found
 	}
@@ -325,6 +313,11 @@ public sealed partial class InteractionPrompt : Physical
 			else
 			{
 				_prompt.Visible = true;
+			}
+		}
+		if (_uiMode == UIModeEnum.GUI3D) {
+			foreach (var gui3d in _gui3Ds) {
+				((Node3D)gui3d.GDNode).Visible = _prompt.Visible; 
 			}
 		}
 
@@ -371,7 +364,8 @@ public sealed partial class InteractionPrompt : Physical
 			}
 
 		}
-		_progressBar.Value = (_timeSpentActivating / _activationTime) * 100f;
+		_progress = (_timeSpentActivating / _activationTime);
+		_progressBar.Value = _progress * 100f;
 	}
 
 	[ScriptMethod]
@@ -418,4 +412,11 @@ public sealed partial class InteractionPrompt : Physical
 	}
 
 	[ScriptProperty] public PTSignal<Player> Interacted { get; private set; } = new();
+
+	[ScriptEnum("UIMode")]
+	public enum UIModeEnum
+	{
+		Default,
+		GUI3D
+	}
 }
