@@ -338,9 +338,10 @@ public sealed partial class Player : NPC
 
 	public static string GetBadgeIconPath(Player player)
 	{
-		string badgeName = player.IsAdmin ? "admin"
+		string badgeName = !string.IsNullOrEmpty(player.UserRoleClass) ? player.UserRoleClass
+			: player.IsAdmin ? "admin"
 			: player.IsCreator ? "creator"
-			: player.UserRoleClass;
+			: "";
 
 		if (string.IsNullOrEmpty(badgeName))
 			return "";
@@ -398,8 +399,11 @@ public sealed partial class Player : NPC
 	[
 		"wave",
 		"dance",
+		"dance2",
 		"helicopter",
 		"sit",
+		"agree",
+		"disagree",
 	];
 
 	// List of all emotes
@@ -410,6 +414,11 @@ public sealed partial class Player : NPC
 		"helicopter",
 		"sit",
 		"point",
+		"agree",
+		"disagree",
+		"scream",
+		"dance2",
+		"disappointed",
 	];
 
 	// Oneshot emotes
@@ -417,6 +426,10 @@ public sealed partial class Player : NPC
 	[
 		"wave",
 		"point",
+		"disagree",
+		"agree",
+		"scream",
+		"disappointed",
 	];
 
 	public override void InitGDNode()

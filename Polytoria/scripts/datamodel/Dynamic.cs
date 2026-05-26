@@ -233,7 +233,8 @@ public partial class Dynamic : Instance
 		}
 	}
 
-	[ScriptProperty] public Vector3 Forward => -GetGlobalTransform().Basis.Z.Normalized();
+	// correct for godot would be -Z, but due to issues described in issue #369, we are using +Z except for the camera
+	[ScriptProperty] public Vector3 Forward => GetGlobalTransform().Basis.Z.Normalized();
 	[ScriptProperty] public Vector3 Right => GetGlobalTransform().Basis.X.Normalized();
 	[ScriptProperty] public Vector3 Up => GetGlobalTransform().Basis.Y.Normalized();
 
@@ -418,7 +419,16 @@ public partial class Dynamic : Instance
 			throw new InvalidOperationException("LookAt Target is invalid");
 		}
 
-		GDNode3D.LookAt(pos, up);
+		Vector3 lookTarget = pos;
+
+		// Godot's LookAt points at -Z, Polytoria uses +Z as forward
+		if (this is not Camera)
+		{
+			Vector3 origin = GDNode3D.GlobalPosition;
+			lookTarget = origin - (pos - origin);
+		}
+
+		GDNode3D.LookAt(lookTarget, up);
 
 		UpdateNetTransformReliable();
 	}
@@ -588,7 +598,7 @@ public partial class Dynamic : Instance
 		if (OverrideNetworkTransform) return;
 		Vector3 scale = GetLocalTransform().Basis.Scale;
 		_netTransform = new Transform3D(
-			new Basis(transform.Rotation).Scaled(scale),
+			new Basis(transform.Rotation).ScaledLocal(scale),
 			transform.Position
 		);
 		_isDirty = true;
