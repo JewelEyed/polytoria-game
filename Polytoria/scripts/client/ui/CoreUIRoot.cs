@@ -36,6 +36,7 @@ public partial class CoreUIRoot : CanvasLayer
 	[Export] public UINotification NotificationCenter = null!;
 	[Export] public UICapturePreview CapturePreview = null!;
 	[Export] public UIPurchasePrompt PurchasePrompt = null!;
+	[Export] public TextureRect CtrlLockCursor = null!;
 	[Export] public DevConsoleWindow DevWindow = null!;
 
 	/// <summary>
@@ -67,6 +68,20 @@ public partial class CoreUIRoot : CanvasLayer
 #endif
 
 		base._EnterTree();
+	}
+
+	public override void _Process(double delta)
+	{
+		SyncCtrlLockCursor();
+		base._Process(delta);
+	}
+
+	private void SyncCtrlLockCursor()
+	{
+		if (CtrlLockCursor != null)
+		{
+			CtrlLockCursor.Visible = Root?.Environment?.CurrentCamera?.CtrlLocked == true;
+		}
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
