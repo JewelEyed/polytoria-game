@@ -57,7 +57,7 @@ public sealed partial class InteractionPrompt : Physical
 	private List<GUI3D> _gui3Ds = new();
 
 	[Editable, ScriptProperty]
-	public UIModeEnum UIMode 
+	public UIModeEnum UIMode
 	{
 		get => _uiMode;
 		set
@@ -65,8 +65,10 @@ public sealed partial class InteractionPrompt : Physical
 			_uiMode = value;
 			_prompt.GetNode<Sprite3D>("Sprite3D").Visible = _uiMode == UIModeEnum.Default;
 			_gui3Ds.Clear();
-			foreach (var child in GetChildren()) {
-				if (child is GUI3D) {
+			foreach (var child in GetChildren())
+			{
+				if (child is GUI3D)
+				{
 					_gui3Ds.Add((GUI3D)child);
 				}
 			}
@@ -315,9 +317,11 @@ public sealed partial class InteractionPrompt : Physical
 				_prompt.Visible = true;
 			}
 		}
-		if (_uiMode == UIModeEnum.GUI3D) {
-			foreach (var gui3d in _gui3Ds) {
-				((Node3D)gui3d.GDNode).Visible = _prompt.Visible; 
+		if (_uiMode == UIModeEnum.GUI3D)
+		{
+			foreach (var gui3d in _gui3Ds)
+			{
+				((Node3D)gui3d.GDNode).Visible = _prompt.Visible;
 			}
 		}
 
