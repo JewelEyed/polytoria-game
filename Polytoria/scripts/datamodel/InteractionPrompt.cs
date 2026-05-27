@@ -325,7 +325,7 @@ public sealed partial class InteractionPrompt : Physical
 			}
 		}
 
-		base.PhysicsProcess(delta);
+		base.Process(delta);
 
 		if (_hiddenByServer)
 		{
