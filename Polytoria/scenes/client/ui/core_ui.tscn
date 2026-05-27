@@ -27,7 +27,7 @@
 [ext_resource type="Texture2D" uid="uid://x8rbtcckir1a" path="res://assets/textures/client/ui/indicators/silence.svg" id="20_gmv8i"]
 [ext_resource type="PackedScene" uid="uid://bycaka8x6gyon" path="res://scenes/client/ui/core/debug_console_window.tscn" id="20_yrpeo"]
 [ext_resource type="PackedScene" uid="uid://b8dmrhqpwspyn" path="res://scenes/client/ui/purchase/purchase_prompt.tscn" id="28_gmv8i"]
-[ext_resource type="Texture2D" uid="uid://86t7sgekbev1" path="res://assets/textures/client/cursor/crosshair.png" id="29_0curs"]
+[ext_resource type="Texture2D" uid="uid://86t7sgekbev1" path="res://assets/textures/client/cursor/chevron-up.png" id="29_0curs"]
 
 [sub_resource type="Animation" id="Animation_mt8aq"]
 length = 0.001
@@ -544,10 +544,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -16.0
-offset_top = -16.0
-offset_right = 16.0
-offset_bottom = 16.0
+offset_left = -18.0
+offset_top = -18.0
+offset_right = 18.0
+offset_bottom = 18.0
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(16, 16)

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jqk7sbs7eqxt"
-path="res://.godot/imported/crosshair.png-38e49618b5af7fc8d98b3b4cce66dc05.ctex"
+uid="uid://dgu7a7qlkohr5"
+path="res://.godot/imported/chevron-up.png-1f0380e3affe0f1f2cdccfcabc89affa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/client/cursor/crosshair.png"
-dest_files=["res://.godot/imported/crosshair.png-38e49618b5af7fc8d98b3b4cce66dc05.ctex"]
+source_file="res://assets/textures/client/cursor/chevron-up.png"
+dest_files=["res://.godot/imported/chevron-up.png-1f0380e3affe0f1f2cdccfcabc89affa.ctex"]
 
 [params]
 
