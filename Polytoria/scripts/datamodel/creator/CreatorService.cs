@@ -613,7 +613,7 @@ public sealed partial class CreatorService : Node, IScriptObject
 }
 
 [ScriptEnum("CreatorToolMode", IsCreatorOnly = true)]
-public enum ToolModeEnum
+public enum GeneralToolModeEnum
 {
 	Select,
 	Move,
@@ -622,6 +622,8 @@ public enum ToolModeEnum
 	Paint,
 	Brush
 }
+
+
 
 public enum ScriptTypeEnum
 {

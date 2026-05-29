@@ -345,10 +345,10 @@ public sealed partial class Gizmos : Node
 
 		if (Selected.Count == 0) sv = false;
 
-		Move.Visible = CreatorService.Interface.ToolMode == ToolModeEnum.Move && sv;
-		Rotate.Visible = CreatorService.Interface.ToolMode == ToolModeEnum.Rotate && sv;
+		Move.Visible = CreatorService.Interface.ToolMode == GeneralToolModeEnum.Move && sv;
+		Rotate.Visible = CreatorService.Interface.ToolMode == GeneralToolModeEnum.Rotate && sv;
 
-		if (CreatorService.Interface.ToolMode == ToolModeEnum.Scale && sv)
+		if (CreatorService.Interface.ToolMode == GeneralToolModeEnum.Scale && sv)
 		{
 			bool sr = false;
 			if (Selected.Count == 1 && Selected[0] is Part)
@@ -424,7 +424,7 @@ public sealed partial class Gizmos : Node
 	public override void _Input(InputEvent @event)
 	{
 		if (!Root.CreatorContext.IsViewportFocused) { return; }
-		ToolModeEnum toolMode = CreatorService.Interface.ToolMode;
+		GeneralToolModeEnum toolMode = CreatorService.Interface.ToolMode;
 
 		Vector2 mousePos = _camera.GetViewport().GetMousePosition();
 
@@ -444,7 +444,7 @@ public sealed partial class Gizmos : Node
 			hoveringOn = Dynamic.GetDynFromCreatorBounds((Node)intersection["collider"]);
 		}
 
-		if (toolMode == ToolModeEnum.Paint)
+		if (toolMode == GeneralToolModeEnum.Paint)
 		{
 			if (hoveringOn != null && hoveringOn is Part && !hoveringOn.Locked)
 			{
@@ -474,7 +474,7 @@ public sealed partial class Gizmos : Node
 		}
 
 		// Select shortcuts
-		if (toolMode == ToolModeEnum.Select)
+		if (toolMode == GeneralToolModeEnum.Select)
 		{
 			if (@event.IsActionPressed("gizmo_rotate"))
 			{
@@ -551,7 +551,7 @@ public sealed partial class Gizmos : Node
 						Root.CreatorContext.Selections.SelectOnly(targetDyn);
 					}
 
-					if (toolMode == ToolModeEnum.Select)
+					if (toolMode == GeneralToolModeEnum.Select)
 					{
 						DragSelected.Add(targetDyn);
 						_isDragPending = true;
@@ -646,7 +646,7 @@ public sealed partial class Gizmos : Node
 		if (dyn is Part p)
 		{
 			CreatorHistory history = Root.CreatorContext.History;
-			if (CreatorService.Interface.ToolMode == ToolModeEnum.Paint)
+			if (CreatorService.Interface.ToolMode == GeneralToolModeEnum.Paint)
 			{
 				Color oldC = p.Color;
 				Color newC = CreatorService.Interface.TargetPartColor;
@@ -661,7 +661,7 @@ public sealed partial class Gizmos : Node
 				}));
 				history.CommitAction();
 			}
-			else if (CreatorService.Interface.ToolMode == ToolModeEnum.Brush)
+			else if (CreatorService.Interface.ToolMode == GeneralToolModeEnum.Brush)
 			{
 				Part.PartMaterialEnum oldC = p.Material;
 				Part.PartMaterialEnum newC = CreatorService.Interface.TargetPartMaterial;

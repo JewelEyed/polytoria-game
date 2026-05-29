@@ -126,7 +126,7 @@ public partial class SelectionBox : Node
 
 		var toolMode = CreatorService.Interface.ToolMode;
 		Aabb globalBounds;
-		bool isDragging = RootGizmos != null && RootGizmos.HoveringGizmos && (toolMode == ToolModeEnum.Move || toolMode == ToolModeEnum.Select);
+		bool isDragging = RootGizmos != null && RootGizmos.HoveringGizmos && (toolMode == GeneralToolModeEnum.Move || toolMode == GeneralToolModeEnum.Select);
 
 		if (isDragging && _cachedGlobalBounds.HasValue)
 		{

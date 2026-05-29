@@ -10,5 +10,5 @@ namespace Polytoria.Creator.UI;
 public partial class RibbonToolButton : Button
 {
 	[Export]
-	public GeneralToolModeEnum GeneralToolMode;
+	public GeneralToolModeEnum ToolMode;
 }
