@@ -106,11 +106,11 @@ public sealed partial class Ribbon : PanelContainer
 	private void OnRibbonChanged(BaseButton rawBtn)
 	{
 		RibbonToolButton btn = (RibbonToolButton)rawBtn;
-		CreatorService.Interface.ToolMode = btn.ToolMode;
-		switch (btn.ToolMode)
+		CreatorService.Interface.ToolMode = btn.GeneralToolMode;
+		switch (btn.GeneralToolMode)
 		{
-			case ToolModeEnum.Paint:
-			case ToolModeEnum.Brush:
+			case GeneralToolModeEnum.Paint:
+			case GeneralToolModeEnum.Brush:
 				World.Current?.Container?.GrabFocus();
 				break;
 		}

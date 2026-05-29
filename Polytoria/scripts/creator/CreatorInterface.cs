@@ -50,7 +50,7 @@ public partial class CreatorInterface : Control, IScriptObject
 	public StatusBar? StatusBar { get; internal set; }
 	public LoadOverlay? LoadOverlay { get; internal set; }
 
-	[ScriptProperty] public ToolModeEnum ToolMode { get; internal set; } = ToolModeEnum.Select;
+	[ScriptProperty] public GeneralToolModeEnum ToolMode { get; internal set; } = GeneralToolModeEnum.Select;
 	[ScriptProperty] public Color TargetPartColor { get; internal set; } = new(1, 1, 1);
 	[ScriptProperty] public Part.PartMaterialEnum TargetPartMaterial { get; internal set; } = Part.PartMaterialEnum.SmoothPlastic;
 

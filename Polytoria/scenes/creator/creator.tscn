@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://4n14p76bkw70" path="res://assets/textures/ui-icons/camera.svg" id="8_q8usk"]
 [ext_resource type="Texture2D" uid="uid://bsg2b8blnr0ny" path="res://assets/textures/creator/ribbon/rotate.svg" id="9_it5bq"]
 [ext_resource type="Texture2D" uid="uid://bhcmiy3o6eest" path="res://assets/textures/creator/ribbon/scale.svg" id="10_c8w7j"]
+[ext_resource type="Texture2D" uid="uid://4ifji13knxu3" path="res://assets/textures/ui-icons/cube.svg" id="11_dfqoe"]
 [ext_resource type="Script" uid="uid://dvr4of2s1oioc" path="res://scripts/creator/ui/SnappingMenu.cs" id="13_0tvsp"]
 [ext_resource type="Texture2D" uid="uid://cxegnipp80454" path="res://assets/textures/creator/ribbon/paint.svg" id="15_8cbqn"]
 [ext_resource type="Theme" uid="uid://bx8eei233777s" path="res://resources/themes/creator/tabs.tres" id="16_1f7jh"]
@@ -26,8 +27,11 @@
 [ext_resource type="Script" uid="uid://bxbrkay4hx47r" path="res://scripts/creator/ui/ColorPicker.cs" id="20_smqtq"]
 [ext_resource type="FontFile" uid="uid://clwbylh8y2lf2" path="res://assets/fonts/creator/JetBrainsMono-Regular.ttf" id="21_je108"]
 [ext_resource type="Texture2D" uid="uid://bstnds573cu1e" path="res://assets/textures/ui-icons/trash.svg" id="22_i1txp"]
+[ext_resource type="Texture2D" uid="uid://boh3ru8j0fylu" path="res://assets/textures/ui-icons/edit.svg" id="23_ce354"]
+[ext_resource type="Texture2D" uid="uid://wvryubesbjuh" path="res://assets/textures/ui-icons/sphere.svg" id="24_raaus"]
 [ext_resource type="PackedScene" uid="uid://ba2m71tw3g6mf" path="res://scenes/creator/load_overlay.tscn" id="25_b5k6b"]
 [ext_resource type="Texture2D" uid="uid://c60spvojllrt4" path="res://assets/textures/ui-icons/chevron-left.svg" id="25_bc04q"]
+[ext_resource type="Texture2D" uid="uid://bjarkputo8d8k" path="res://assets/textures/ui-icons/polygon.svg" id="25_w8gex"]
 [ext_resource type="Texture2D" uid="uid://yd5kv6j4l3hp" path="res://assets/textures/ui-icons/chevron-right.svg" id="26_4n5gq"]
 [ext_resource type="Texture2D" uid="uid://dk3ggy6lhcnbu" path="res://assets/textures/ui-icons/empty.png" id="26_bc04q"]
 [ext_resource type="PackedScene" uid="uid://bfh6n2s5op0nu" path="res://scenes/creator/docks/toolbox/toolbox.tscn" id="26_dfqoe"]
@@ -150,10 +154,9 @@ content_margin_right = 8.0
 content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nen57"]
-content_margin_left = 6.0
-content_margin_top = 6.0
-content_margin_right = 6.0
-content_margin_bottom = 6.0
+content_margin_left = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
 bg_color = Color(0.12156863, 0.12156863, 0.12156863, 1)
 border_width_left = 2
 border_width_top = 2
@@ -189,6 +192,49 @@ VSeparator/styles/separator = SubResource("StyleBoxFlat_p3aol")
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_v0rtd"]
 resource_name = "RibbonGroup"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bc04q"]
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 6.0
+bg_color = Color(0.12156863, 0.12156863, 0.12156863, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_color = Color(0.16078432, 0.16078432, 0.16078432, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dfqoe"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.12156863, 0.12156863, 0.12156863, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+expand_margin_left = 6.0
+expand_margin_right = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ntijg"]
+bg_color = Color(0.12156863, 0.12156863, 0.12156863, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+expand_margin_left = 6.0
+expand_margin_right = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4n5gq"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.078431375, 0.078431375, 0.078431375, 0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+expand_margin_left = 6.0
+expand_margin_right = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ce354"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i16x2"]
 resource_name = "ColorPreview"
@@ -578,19 +624,39 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 32.0
-offset_bottom = 116.0
+offset_bottom = 140.0
 grow_horizontal = 2
 mouse_filter = 2
 theme = SubResource("Theme_blgnk")
 script = ExtResource("2_40iam")
 _ribbonGroup = SubResource("ButtonGroup_v0rtd")
 
-[node name="Buttons" type="HBoxContainer" parent="GUI/Ribbon" unique_id=566578913]
+[node name="TabContainer" type="TabContainer" parent="GUI/Ribbon" unique_id=574912756]
+layout_mode = 2
+theme_override_colors/font_selected_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hovered_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_unselected_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_constants/tab_separation = 18
+theme_override_constants/icon_max_width = 10
+theme_override_font_sizes/font_size = 12
+theme_override_styles/panel = SubResource("StyleBoxFlat_bc04q")
+theme_override_styles/tab_unselected = SubResource("StyleBoxFlat_dfqoe")
+theme_override_styles/tab_hovered = SubResource("StyleBoxFlat_ntijg")
+theme_override_styles/tab_selected = SubResource("StyleBoxFlat_4n5gq")
+theme_override_styles/tab_focus = SubResource("StyleBoxFlat_ce354")
+tab_alignment = 1
+current_tab = 1
+tab_0/icon = ExtResource("5_1xu8h")
+tab_1/icon = ExtResource("11_dfqoe")
+
+[node name="General" type="HBoxContainer" parent="GUI/Ribbon/TabContainer" unique_id=566578913]
+visible = false
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 8
+metadata/_tab_index = 0
 
-[node name="Select" type="Button" parent="GUI/Ribbon/Buttons" unique_id=2044440450]
+[node name="Select" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=2044440450]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 toggle_mode = true
@@ -599,7 +665,7 @@ action_mode = 0
 button_group = SubResource("ButtonGroup_v0rtd")
 script = ExtResource("8_c8w7j")
 
-[node name="Icon" type="TextureRect" parent="GUI/Ribbon/Buttons/Select" unique_id=75873074]
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Select" unique_id=75873074]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -611,7 +677,7 @@ texture = ExtResource("7_7a4vs")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Select" unique_id=319874703]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Select" unique_id=319874703]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -622,7 +688,7 @@ text = "Select"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Move" type="Button" parent="GUI/Ribbon/Buttons" unique_id=1368267025]
+[node name="Move" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=1368267025]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 toggle_mode = true
@@ -630,8 +696,9 @@ action_mode = 0
 button_group = SubResource("ButtonGroup_v0rtd")
 script = ExtResource("8_c8w7j")
 ToolMode = 1
+GeneralToolMode = 1
 
-[node name="Icon" type="TextureRect" parent="GUI/Ribbon/Buttons/Move" unique_id=1003543172]
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Move" unique_id=1003543172]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -643,7 +710,7 @@ texture = ExtResource("8_a562s")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Move" unique_id=41438839]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Move" unique_id=41438839]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -654,7 +721,7 @@ text = "Move"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Rotate" type="Button" parent="GUI/Ribbon/Buttons" unique_id=240059313]
+[node name="Rotate" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=240059313]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 toggle_mode = true
@@ -662,8 +729,9 @@ action_mode = 0
 button_group = SubResource("ButtonGroup_v0rtd")
 script = ExtResource("8_c8w7j")
 ToolMode = 2
+GeneralToolMode = 2
 
-[node name="Icon" type="TextureRect" parent="GUI/Ribbon/Buttons/Rotate" unique_id=884166956]
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Rotate" unique_id=884166956]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -675,7 +743,7 @@ texture = ExtResource("9_it5bq")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Rotate" unique_id=1544704217]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Rotate" unique_id=1544704217]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -686,7 +754,7 @@ text = "Rotate"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Scale" type="Button" parent="GUI/Ribbon/Buttons" unique_id=1555983016]
+[node name="Scale" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=1555983016]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 toggle_mode = true
@@ -694,8 +762,9 @@ action_mode = 0
 button_group = SubResource("ButtonGroup_v0rtd")
 script = ExtResource("8_c8w7j")
 ToolMode = 3
+GeneralToolMode = 3
 
-[node name="Icon" type="TextureRect" parent="GUI/Ribbon/Buttons/Scale" unique_id=182227236]
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Scale" unique_id=182227236]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -707,7 +776,7 @@ texture = ExtResource("10_c8w7j")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Scale" unique_id=1577178464]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Scale" unique_id=1577178464]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -718,11 +787,11 @@ text = "Scale"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Separator" type="VSeparator" parent="GUI/Ribbon/Buttons" unique_id=1785077412]
+[node name="Separator" type="VSeparator" parent="GUI/Ribbon/TabContainer/General" unique_id=1785077412]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Snapping" type="VBoxContainer" parent="GUI/Ribbon/Buttons" unique_id=2133884039 node_paths=PackedStringArray("_moveCheck", "_moveValue", "_rotateCheck", "_rotateValue")]
+[node name="Snapping" type="VBoxContainer" parent="GUI/Ribbon/TabContainer/General" unique_id=2133884039 node_paths=PackedStringArray("_moveCheck", "_moveValue", "_rotateCheck", "_rotateValue")]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
@@ -732,13 +801,13 @@ _moveValue = NodePath("Move/Value")
 _rotateCheck = NodePath("Rotate/Check")
 _rotateValue = NodePath("Rotate/Value")
 
-[node name="Move" type="HBoxContainer" parent="GUI/Ribbon/Buttons/Snapping" unique_id=1273399493]
+[node name="Move" type="HBoxContainer" parent="GUI/Ribbon/TabContainer/General/Snapping" unique_id=1273399493]
 layout_mode = 2
 size_flags_vertical = 10
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="Check" type="CheckBox" parent="GUI/Ribbon/Buttons/Snapping/Move" unique_id=1379247795]
+[node name="Check" type="CheckBox" parent="GUI/Ribbon/TabContainer/General/Snapping/Move" unique_id=1379247795]
 custom_minimum_size = Vector2(87, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -746,7 +815,7 @@ button_pressed = true
 action_mode = 0
 text = "Move"
 
-[node name="Value" type="SpinBox" parent="GUI/Ribbon/Buttons/Snapping/Move" unique_id=1742592186]
+[node name="Value" type="SpinBox" parent="GUI/Ribbon/TabContainer/General/Snapping/Move" unique_id=1742592186]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -757,13 +826,13 @@ value = 1.0
 custom_arrow_step = 1.0
 select_all_on_focus = true
 
-[node name="Rotate" type="HBoxContainer" parent="GUI/Ribbon/Buttons/Snapping" unique_id=806355042]
+[node name="Rotate" type="HBoxContainer" parent="GUI/Ribbon/TabContainer/General/Snapping" unique_id=806355042]
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="Check" type="CheckBox" parent="GUI/Ribbon/Buttons/Snapping/Rotate" unique_id=146334442]
+[node name="Check" type="CheckBox" parent="GUI/Ribbon/TabContainer/General/Snapping/Rotate" unique_id=146334442]
 custom_minimum_size = Vector2(87, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -771,7 +840,7 @@ button_pressed = true
 action_mode = 0
 text = "Rotate"
 
-[node name="Value" type="SpinBox" parent="GUI/Ribbon/Buttons/Snapping/Rotate" unique_id=2016546389]
+[node name="Value" type="SpinBox" parent="GUI/Ribbon/TabContainer/General/Snapping/Rotate" unique_id=2016546389]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -783,18 +852,18 @@ suffix = "°"
 custom_arrow_step = 1.0
 select_all_on_focus = true
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Snapping" unique_id=1849470148]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Snapping" unique_id=1849470148]
 layout_mode = 2
 size_flags_vertical = 8
 text = "Snapping"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Separator2" type="VSeparator" parent="GUI/Ribbon/Buttons" unique_id=204083408]
+[node name="Separator2" type="VSeparator" parent="GUI/Ribbon/TabContainer/General" unique_id=204083408]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Paint" type="Button" parent="GUI/Ribbon/Buttons" unique_id=261213070]
+[node name="Paint" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=261213070]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 toggle_mode = true
@@ -802,8 +871,9 @@ action_mode = 0
 button_group = SubResource("ButtonGroup_v0rtd")
 script = ExtResource("8_c8w7j")
 ToolMode = 4
+GeneralToolMode = 4
 
-[node name="Icon" type="TextureRect" parent="GUI/Ribbon/Buttons/Paint" unique_id=1855452047]
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Paint" unique_id=1855452047]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -815,7 +885,7 @@ texture = ExtResource("15_8cbqn")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Color" type="TextureRect" parent="GUI/Ribbon/Buttons/Paint" unique_id=465283541]
+[node name="Color" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Paint" unique_id=465283541]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -827,7 +897,7 @@ texture = ExtResource("16_87ukk")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Paint" unique_id=1389536077]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Paint" unique_id=1389536077]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -838,12 +908,12 @@ text = "Paint"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Color" type="Button" parent="GUI/Ribbon/Buttons" unique_id=7063199]
+[node name="Color" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=7063199]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 action_mode = 0
 
-[node name="Preview" type="Panel" parent="GUI/Ribbon/Buttons/Color" unique_id=1336031454]
+[node name="Preview" type="Panel" parent="GUI/Ribbon/TabContainer/General/Color" unique_id=1336031454]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -855,7 +925,7 @@ offset_bottom = -23.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_i16x2")
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Color" unique_id=27688629]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Color" unique_id=27688629]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -866,7 +936,7 @@ text = "Color"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Brush" type="Button" parent="GUI/Ribbon/Buttons" unique_id=1342513770]
+[node name="Brush" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=1342513770]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 toggle_mode = true
@@ -874,8 +944,9 @@ action_mode = 0
 button_group = SubResource("ButtonGroup_v0rtd")
 script = ExtResource("8_c8w7j")
 ToolMode = 5
+GeneralToolMode = 5
 
-[node name="Icon" type="TextureRect" parent="GUI/Ribbon/Buttons/Brush" unique_id=2047361056]
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Brush" unique_id=2047361056]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -888,7 +959,7 @@ texture = ExtResource("17_8cbqn")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Brush" unique_id=1464538429]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Brush" unique_id=1464538429]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -899,13 +970,13 @@ text = "Brush"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Material" type="Button" parent="GUI/Ribbon/Buttons" unique_id=420682314]
+[node name="Material" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=420682314]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 theme = SubResource("Theme_c8w7j")
 action_mode = 0
 
-[node name="Preview" type="Panel" parent="GUI/Ribbon/Buttons/Material" unique_id=1020355807]
+[node name="Preview" type="Panel" parent="GUI/Ribbon/TabContainer/General/Material" unique_id=1020355807]
 clip_children = 1
 layout_mode = 1
 anchors_preset = -1
@@ -918,7 +989,7 @@ offset_bottom = -23.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_b5x0k")
 
-[node name="Texture" type="TextureRect" parent="GUI/Ribbon/Buttons/Material/Preview" unique_id=438322129]
+[node name="Texture" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Material/Preview" unique_id=438322129]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -930,7 +1001,7 @@ texture = ExtResource("7_c5rx7")
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Material" unique_id=145670301]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Material" unique_id=145670301]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -941,41 +1012,39 @@ text = "Material"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="Popup" type="PopupPanel" parent="GUI/Ribbon/Buttons/Material" unique_id=54091526]
+[node name="Popup" type="PopupPanel" parent="GUI/Ribbon/TabContainer/General/Material" unique_id=54091526]
 oversampling_override = 1.0
 size = Vector2i(200, 428)
 
-[node name="Container" type="ItemList" parent="GUI/Ribbon/Buttons/Material/Popup" unique_id=781859665]
+[node name="Container" type="ItemList" parent="GUI/Ribbon/TabContainer/General/Material/Popup" unique_id=781859665]
 z_index = 5
 custom_minimum_size = Vector2(0, 420)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 200.0
-offset_bottom = 428.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = SubResource("Theme_byekl")
 auto_width = true
 fixed_icon_size = Vector2i(40, 40)
 
-[node name="PopupSpawn" type="Control" parent="GUI/Ribbon/Buttons/Material" unique_id=1975441004]
+[node name="PopupSpawn" type="Control" parent="GUI/Ribbon/TabContainer/General/Material" unique_id=1975441004]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 grow_vertical = 0
 
-[node name="Separator3" type="VSeparator" parent="GUI/Ribbon/Buttons" unique_id=1661999198]
+[node name="Separator3" type="VSeparator" parent="GUI/Ribbon/TabContainer/General" unique_id=1661999198]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Insert" type="Button" parent="GUI/Ribbon/Buttons" unique_id=462576719]
+[node name="Insert" type="Button" parent="GUI/Ribbon/TabContainer/General" unique_id=462576719]
 custom_minimum_size = Vector2(62, 0)
 layout_mode = 2
 action_mode = 0
 
-[node name="Icon" type="TextureRect" parent="GUI/Ribbon/Buttons/Insert" unique_id=1260895583]
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/General/Insert" unique_id=1260895583]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -987,7 +1056,7 @@ texture = ExtResource("19_87ukk")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="GUI/Ribbon/Buttons/Insert" unique_id=2100938883]
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/General/Insert" unique_id=2100938883]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = 1.0
@@ -998,12 +1067,220 @@ text = "Insert"
 horizontal_alignment = 1
 vertical_alignment = 2
 
+[node name="CSG" type="HBoxContainer" parent="GUI/Ribbon/TabContainer" unique_id=752752198]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+metadata/_tab_index = 1
+
+[node name="Edit" type="Button" parent="GUI/Ribbon/TabContainer/CSG" unique_id=55456779]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+action_mode = 0
+button_group = SubResource("ButtonGroup_v0rtd")
+script = ExtResource("8_c8w7j")
+
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/CSG/Edit" unique_id=2111020361]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = -20.0
+mouse_filter = 2
+texture = ExtResource("23_ce354")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/CSG/Edit" unique_id=1080968732]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+text = "Edit"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Block" type="Button" parent="GUI/Ribbon/TabContainer/CSG" unique_id=827134026]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+toggle_mode = true
+action_mode = 0
+button_group = SubResource("ButtonGroup_v0rtd")
+script = ExtResource("8_c8w7j")
+ToolMode = 1
+
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/CSG/Block" unique_id=73279761]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = -20.0
+mouse_filter = 2
+texture = ExtResource("11_dfqoe")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/CSG/Block" unique_id=2003474759]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+text = "Block"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Sphere" type="Button" parent="GUI/Ribbon/TabContainer/CSG" unique_id=884314041]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+toggle_mode = true
+action_mode = 0
+button_group = SubResource("ButtonGroup_v0rtd")
+script = ExtResource("8_c8w7j")
+ToolMode = 2
+
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/CSG/Sphere" unique_id=1711359160]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 4.0
+offset_bottom = -20.0
+mouse_filter = 2
+texture = ExtResource("24_raaus")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/CSG/Sphere" unique_id=1957136776]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+text = "Shape"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Polygon" type="Button" parent="GUI/Ribbon/TabContainer/CSG" unique_id=1809808732]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+toggle_mode = true
+action_mode = 0
+button_group = SubResource("ButtonGroup_v0rtd")
+script = ExtResource("8_c8w7j")
+ToolMode = 3
+
+[node name="Icon" type="TextureRect" parent="GUI/Ribbon/TabContainer/CSG/Polygon" unique_id=950939180]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 4.0
+offset_bottom = -20.0
+mouse_filter = 2
+texture = ExtResource("25_w8gex")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/CSG/Polygon" unique_id=1628074379]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+text = "Scale"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Separator" type="VSeparator" parent="GUI/Ribbon/TabContainer/CSG" unique_id=713615809]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Snapping" type="VBoxContainer" parent="GUI/Ribbon/TabContainer/CSG" unique_id=18441070 node_paths=PackedStringArray("_moveCheck", "_moveValue", "_rotateCheck", "_rotateValue")]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+script = ExtResource("13_0tvsp")
+_moveCheck = NodePath("Move/Check")
+_moveValue = NodePath("Move/Value")
+_rotateCheck = NodePath("Rotate/Check")
+_rotateValue = NodePath("Rotate/Value")
+
+[node name="Move" type="HBoxContainer" parent="GUI/Ribbon/TabContainer/CSG/Snapping" unique_id=558452528]
+layout_mode = 2
+size_flags_vertical = 10
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Check" type="CheckBox" parent="GUI/Ribbon/TabContainer/CSG/Snapping/Move" unique_id=1871075704]
+custom_minimum_size = Vector2(87, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+button_pressed = true
+action_mode = 0
+text = "Move"
+
+[node name="Value" type="SpinBox" parent="GUI/Ribbon/TabContainer/CSG/Snapping/Move" unique_id=2061689265]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.001
+max_value = 1000.0
+step = 0.001
+value = 1.0
+custom_arrow_step = 1.0
+select_all_on_focus = true
+
+[node name="Rotate" type="HBoxContainer" parent="GUI/Ribbon/TabContainer/CSG/Snapping" unique_id=71633262]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Check" type="CheckBox" parent="GUI/Ribbon/TabContainer/CSG/Snapping/Rotate" unique_id=989044920]
+custom_minimum_size = Vector2(87, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+button_pressed = true
+action_mode = 0
+text = "Rotate"
+
+[node name="Value" type="SpinBox" parent="GUI/Ribbon/TabContainer/CSG/Snapping/Rotate" unique_id=1546982009]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.001
+max_value = 180.0
+step = 0.001
+value = 45.0
+suffix = "°"
+custom_arrow_step = 1.0
+select_all_on_focus = true
+
+[node name="Label" type="Label" parent="GUI/Ribbon/TabContainer/CSG/Snapping" unique_id=2146406552]
+layout_mode = 2
+size_flags_vertical = 8
+text = "Snapping"
+horizontal_alignment = 1
+vertical_alignment = 2
+
 [node name="Splitter" type="HSplitContainer" parent="GUI" unique_id=1718208415]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 116.0
+offset_top = 140.0
 offset_bottom = -23.0
 grow_horizontal = 2
 grow_vertical = 2
