@@ -38,24 +38,28 @@ public sealed partial class PolytorianModel : CharacterModel
 
 	private const float BlendSpeed = 5f;
 	private const float LookBlendSpeed = 15f;
-	private const string DefaultBodyColor = "#FFFFFF";
+	private static readonly Color _defaultBodyColor = Colors.White;
+
+	private const int ClothingWidth = 1024;
+	private const int ClothingHeight = 1024;
+	private static readonly Rect2I _clothingRect = new(0, 0, ClothingWidth, ClothingHeight);
 
 	private int _loadAppearanceCount = 0;
 
 	internal Skeleton3D Skeleton = null!;
 	internal AnimationTree AnimTree = null!;
 
+	private static readonly Shader _limbShader = GD.Load<Shader>("res://resources/shaders/character/limb.gdshader");
+	private static readonly Shader _transparentLimbShader = GD.Load<Shader>("res://resources/shaders/character/limb_transparent.gdshader");
+	private static readonly Texture2D _defaultFace = GD.Load<Texture2D>("res://assets/textures/client/character/DefaultFace.png");
+	private static readonly StringName _albedoParam = "albedo";
+	private static readonly StringName _albedoTexParam = "albedo_texture";
+
 	private ImageAsset? _faceImage;
 	private MeshAsset? _bodyMesh;
-	private readonly StandardMaterial3D _headMat = new();
-	private readonly StandardMaterial3D _faceMat = new();
-	private readonly StandardMaterial3D _torsoMat = new();
-	private readonly StandardMaterial3D _leftArmMat = new();
-	private readonly StandardMaterial3D _rightArmMat = new();
-	private readonly StandardMaterial3D _leftLegMat = new();
-	private readonly StandardMaterial3D _rightLegMat = new();
-	private readonly StandardMaterial3D[] _shirtMats = new StandardMaterial3D[3];
-	private readonly StandardMaterial3D[] _pantsMats = new StandardMaterial3D[2];
+	private readonly ShaderMaterial _headMat = new() { Shader = _limbShader };
+	private readonly ShaderMaterial _limbMat = new() { Shader = _limbShader };
+	private readonly ShaderMaterial _transparentLimbMat = new() { Shader = _transparentLimbShader };
 	private PhysicalBoneSimulator3D _ragdollBoneSim = null!;
 	private PhysicalBoneSimulator3D? _lastPhysicalBoneSim = null!;
 	private readonly Dictionary<string, float> _blendTargets = [];
@@ -75,12 +79,11 @@ public sealed partial class PolytorianModel : CharacterModel
 	[Editable, ScriptProperty, Export, SyncVar]
 	public Color HeadColor
 	{
-		get => _headMat.AlbedoColor;
+		get => MeshGetAlbedo(HeadMeshInstance);
 		set
 		{
-			_headMat.AlbedoColor = value;
-			_faceMat.AlbedoColor = new(1, 1, 1, value.A);
-			MatApplyAlpha(_headMat, value);
+			_headMat.Shader = (value.A == 1) ? _limbShader : _transparentLimbShader;
+			HeadMeshInstance.SetInstanceShaderParameter(_albedoParam, value);
 			OnPropertyChanged();
 		}
 	}
@@ -88,12 +91,10 @@ public sealed partial class PolytorianModel : CharacterModel
 	[Editable, ScriptProperty, SyncVar]
 	public Color TorsoColor
 	{
-		get => _torsoMat.AlbedoColor;
+		get => MeshGetAlbedo(TorsoMeshInstance);
 		set
 		{
-			_torsoMat.AlbedoColor = value;
-			_shirtMats[1].AlbedoColor = new(1, 1, 1, value.A);
-			MatApplyAlpha(_torsoMat, value);
+			MeshSetAlbedo(TorsoMeshInstance, value);
 			OnPropertyChanged();
 		}
 	}
@@ -101,12 +102,10 @@ public sealed partial class PolytorianModel : CharacterModel
 	[Editable, ScriptProperty, SyncVar]
 	public Color LeftArmColor
 	{
-		get => _leftArmMat.AlbedoColor;
+		get => MeshGetAlbedo(LeftArmMeshInstance);
 		set
 		{
-			_leftArmMat.AlbedoColor = value;
-			_shirtMats[0].AlbedoColor = new(1, 1, 1, value.A);
-			MatApplyAlpha(_leftArmMat, value);
+			MeshSetAlbedo(LeftArmMeshInstance, value);
 			OnPropertyChanged();
 		}
 	}
@@ -114,12 +113,10 @@ public sealed partial class PolytorianModel : CharacterModel
 	[Editable, ScriptProperty, SyncVar]
 	public Color RightArmColor
 	{
-		get => _rightArmMat.AlbedoColor;
+		get => MeshGetAlbedo(RightArmMeshInstance);
 		set
 		{
-			_rightArmMat.AlbedoColor = value;
-			_shirtMats[2].AlbedoColor = new(1, 1, 1, value.A);
-			MatApplyAlpha(_rightArmMat, value);
+			MeshSetAlbedo(RightArmMeshInstance, value);
 			OnPropertyChanged();
 		}
 	}
@@ -127,12 +124,10 @@ public sealed partial class PolytorianModel : CharacterModel
 	[Editable, ScriptProperty, SyncVar]
 	public Color LeftLegColor
 	{
-		get => _leftLegMat.AlbedoColor;
+		get => MeshGetAlbedo(LeftLegMeshInstance);
 		set
 		{
-			_leftLegMat.AlbedoColor = value;
-			_pantsMats[0].AlbedoColor = new(1, 1, 1, value.A);
-			MatApplyAlpha(_leftLegMat, value);
+			MeshSetAlbedo(LeftLegMeshInstance, value);
 			OnPropertyChanged();
 		}
 	}
@@ -140,12 +135,10 @@ public sealed partial class PolytorianModel : CharacterModel
 	[Editable, ScriptProperty, SyncVar]
 	public Color RightLegColor
 	{
-		get => _rightLegMat.AlbedoColor;
+		get => MeshGetAlbedo(RightLegMeshInstance);
 		set
 		{
-			_rightLegMat.AlbedoColor = value;
-			_pantsMats[1].AlbedoColor = new(1, 1, 1, value.A);
-			MatApplyAlpha(_rightLegMat, value);
+			MeshSetAlbedo(RightLegMeshInstance, value);
 			OnPropertyChanged();
 		}
 	}
@@ -176,7 +169,8 @@ public sealed partial class PolytorianModel : CharacterModel
 			}
 			_faceImage = value;
 
-			_faceMat.AlbedoTexture = null;
+			// Clear current face
+			_headMat.SetShaderParameter(_albedoTexParam, new());
 			if (_faceImage != null)
 			{
 				_faceOverrided = true;
@@ -197,7 +191,7 @@ public sealed partial class PolytorianModel : CharacterModel
 			else
 			{
 				// Set to default face
-				_faceMat.AlbedoTexture = GD.Load<Texture2D>("res://assets/textures/client/character/DefaultFace.png");
+				_headMat.SetShaderParameter(_albedoTexParam, _defaultFace);
 			}
 			OnPropertyChanged();
 		}
@@ -249,16 +243,6 @@ public sealed partial class PolytorianModel : CharacterModel
 	public override void Init()
 	{
 		FaceImage = null;
-		_headMat.NextPass = _faceMat;
-
-		_shirtMats[0] = new() { Transparency = BaseMaterial3D.TransparencyEnum.AlphaScissor, RenderPriority = 1 };
-		_shirtMats[1] = new() { Transparency = BaseMaterial3D.TransparencyEnum.AlphaScissor, RenderPriority = 1 };
-		_shirtMats[2] = new() { Transparency = BaseMaterial3D.TransparencyEnum.AlphaScissor, RenderPriority = 1 };
-
-		_pantsMats[0] = new() { Transparency = BaseMaterial3D.TransparencyEnum.AlphaScissor, RenderPriority = 1 };
-		_pantsMats[1] = new() { Transparency = BaseMaterial3D.TransparencyEnum.AlphaScissor, RenderPriority = 1 };
-
-		_faceMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
 
 		_helper = new() { Name = "CharacterHelper", Target = this };
 		Globals.Singleton.AddChild(_helper, true);
@@ -277,11 +261,11 @@ public sealed partial class PolytorianModel : CharacterModel
 		Pivot.Scale = NodeSize;
 
 		HeadMeshInstance.MaterialOverride = _headMat;
-		TorsoMeshInstance.MaterialOverride = _torsoMat;
-		LeftArmMeshInstance.MaterialOverride = _leftArmMat;
-		RightArmMeshInstance.MaterialOverride = _rightArmMat;
-		LeftLegMeshInstance.MaterialOverride = _leftLegMat;
-		RightLegMeshInstance.MaterialOverride = _rightLegMat;
+		TorsoMeshInstance.MaterialOverride = _limbMat;
+		LeftArmMeshInstance.MaterialOverride = _limbMat;
+		RightArmMeshInstance.MaterialOverride = _limbMat;
+		LeftLegMeshInstance.MaterialOverride = _limbMat;
+		RightLegMeshInstance.MaterialOverride = _limbMat;
 
 		AnimTree = GDNode.GetNode<AnimationTree>("AnimationTree");
 		AnimTree.Active = true;
@@ -295,21 +279,10 @@ public sealed partial class PolytorianModel : CharacterModel
 		// Free helper
 		_helper?.QueueFree();
 
-		// Free body part materials
-		_headMat.Dispose();
-		_faceMat.Dispose();
-		_torsoMat.Dispose();
-		_leftArmMat.Dispose();
-		_rightArmMat.Dispose();
-		_leftLegMat.Dispose();
-		_rightLegMat.Dispose();
-
 		// Free materials
-		_shirtMats[0].Dispose();
-		_shirtMats[1].Dispose();
-		_shirtMats[2].Dispose();
-		_pantsMats[0].Dispose();
-		_pantsMats[1].Dispose();
+		_headMat.Dispose();
+		_limbMat.Dispose();
+		_transparentLimbMat.Dispose();
 
 		base.PreDelete();
 	}
@@ -385,9 +358,15 @@ public sealed partial class PolytorianModel : CharacterModel
 		Animator.ImportAnimationRaw("emote_dance", "Dance");
 		Animator.ImportAnimationRaw("emote_helicopter", "Helicopter");
 		Animator.ImportAnimationRaw("emote_sit", "Sit");
+		Animator.ImportAnimationRaw("emote_dance2", "Dance2");
 
 		Animator.ImportOneShotAnimationRaw("emote_wave", "Wave");
 		Animator.ImportOneShotAnimationRaw("emote_point", "Point");
+		Animator.ImportOneShotAnimationRaw("emote_disagree", "Disagree");
+		Animator.ImportOneShotAnimationRaw("emote_agree", "Agree");
+		Animator.ImportOneShotAnimationRaw("emote_scream", "Scream");
+		Animator.ImportOneShotAnimationRaw("emote_disappointed", "Disappointed");
+
 		/*
 		Animator.ImportOneShotAnimationRaw("poly_welcome", "polytorian_2/welcome");
 		Animator.ImportOneShotAnimationRaw("avataredit_pose1", "polytorian_2/pose1");
@@ -443,55 +422,33 @@ public sealed partial class PolytorianModel : CharacterModel
 
 	private void UpdateClothMaterials()
 	{
-		StandardMaterial3D? BuildClothChain()
+		// TODO: combine the face into the composite texture
+		// currently the head gets a unique material since its face isn't baked into the texture
+
+		ImageTexture composite = null!;
+		Clothing[] clothings = GetChildrenOfClass<Clothing>();
+		if (clothings.Length != 0)
 		{
-			StandardMaterial3D? head = null;
-			StandardMaterial3D? tail = null;
-			foreach (var c in GetChildrenOfClass<Clothing>())
+			Image result = Image.CreateEmpty(ClothingWidth, ClothingHeight, false, Image.Format.Rgba8);
+			// the loop draws from back to front, like a painter
+			// clothing is ordered from front to back
+			clothings.Reverse();
+			foreach (Clothing clothing in clothings)
 			{
+				Texture2D? texture = clothing.ClothTexture;
 				// Skip unloaded ones
-				if (c.ClothTexture == null) continue;
-				StandardMaterial3D m = new()
-				{
-					AlbedoTexture = c.ClothTexture,
-					Transparency = BaseMaterial3D.TransparencyEnum.AlphaScissor,
-					RenderPriority = 1
-				};
-				if (head == null) { head = m; tail = m; }
-				else { tail!.NextPass = m; tail = m; }
+				if (texture != null)
+					result.BlendRect(texture.GetImage(), _clothingRect, Vector2I.Zero);
 			}
-			return head;
+			composite = ImageTexture.CreateFromImage(result);
 		}
-
-		StandardMaterial3D? DuplicateWithColor(StandardMaterial3D? source, StandardMaterial3D? previous)
-		{
-			if (source == null) return null;
-			var dup = (StandardMaterial3D)source.Duplicate();
-			if (previous != null) dup.AlbedoColor = previous.AlbedoColor;
-			return dup;
-		}
-
-		var head = BuildClothChain();
-
-		_leftArmMat.NextPass = DuplicateWithColor(head, _shirtMats[0]);
-		_torsoMat.NextPass = DuplicateWithColor(head, _shirtMats[1]);
-		_rightArmMat.NextPass = DuplicateWithColor(head, _shirtMats[2]);
-		_leftLegMat.NextPass = DuplicateWithColor(head, _pantsMats[0]);
-		_rightLegMat.NextPass = DuplicateWithColor(head, _pantsMats[1]);
-
-		if (head != null)
-		{
-			_shirtMats[0] = (StandardMaterial3D)_leftArmMat.NextPass!;
-			_shirtMats[1] = (StandardMaterial3D)_torsoMat.NextPass!;
-			_shirtMats[2] = (StandardMaterial3D)_rightArmMat.NextPass!;
-			_pantsMats[0] = (StandardMaterial3D)_leftLegMat.NextPass!;
-			_pantsMats[1] = (StandardMaterial3D)_rightLegMat.NextPass!;
-		}
+		_limbMat.SetShaderParameter(_albedoTexParam, composite);
+		_transparentLimbMat.SetShaderParameter(_albedoTexParam, composite);
 	}
 
 	private void OnFaceLoaded(Resource tex)
 	{
-		_faceMat.AlbedoTexture = (Texture2D)tex;
+		_headMat.SetShaderParameter(_albedoTexParam, (Texture2D)tex);
 		if (!_faceLoaded)
 		{
 			_faceLoaded = true;
@@ -735,12 +692,12 @@ public sealed partial class PolytorianModel : CharacterModel
 	[ScriptMethod]
 	public void ClearAppearance()
 	{
-		HeadColor = Color.FromString(DefaultBodyColor, new Color());
-		TorsoColor = Color.FromString(DefaultBodyColor, new Color());
-		LeftArmColor = Color.FromString(DefaultBodyColor, new Color());
-		RightArmColor = Color.FromString(DefaultBodyColor, new Color());
-		LeftLegColor = Color.FromString(DefaultBodyColor, new Color());
-		RightLegColor = Color.FromString(DefaultBodyColor, new Color());
+		HeadColor = _defaultBodyColor;
+		TorsoColor = _defaultBodyColor;
+		LeftArmColor = _defaultBodyColor;
+		RightArmColor = _defaultBodyColor;
+		LeftLegColor = _defaultBodyColor;
+		RightLegColor = _defaultBodyColor;
 		FaceImage = null;
 		_faceOverrided = false;
 		_bodyOverrided = false;
@@ -754,10 +711,13 @@ public sealed partial class PolytorianModel : CharacterModel
 		}
 	}
 
-	private static void MatApplyAlpha(StandardMaterial3D m, Color a)
+	private void MeshSetAlbedo(GeometryInstance3D mesh, Color albedo)
 	{
-		m.Transparency = a.A == 1 ? BaseMaterial3D.TransparencyEnum.Disabled : BaseMaterial3D.TransparencyEnum.Alpha;
+		mesh.MaterialOverride = (albedo.A == 1) ? _limbMat : _transparentLimbMat;
+		mesh.SetInstanceShaderParameter(_albedoParam, albedo);
 	}
+
+	private static Color MeshGetAlbedo(GeometryInstance3D mesh) => (Color)mesh.GetInstanceShaderParameter(_albedoParam);
 
 	internal async Task<AvatarLoadResponse> InternalLoadAppearance(int userID, bool loadTool = false, bool loadToolNpc = false)
 	{
@@ -775,12 +735,12 @@ public sealed partial class PolytorianModel : CharacterModel
 		}
 
 		// Apply body color
-		HeadColor = Color.FromString(avatarData.Colors.Head, new Color());
-		TorsoColor = Color.FromString(avatarData.Colors.Torso, new Color());
-		LeftArmColor = Color.FromString(avatarData.Colors.LeftArm, new Color());
-		RightArmColor = Color.FromString(avatarData.Colors.RightArm, new Color());
-		LeftLegColor = Color.FromString(avatarData.Colors.LeftLeg, new Color());
-		RightLegColor = Color.FromString(avatarData.Colors.RightLeg, new Color());
+		HeadColor = Color.FromString(avatarData.Colors.Head, _defaultBodyColor);
+		TorsoColor = Color.FromString(avatarData.Colors.Torso, _defaultBodyColor);
+		LeftArmColor = Color.FromString(avatarData.Colors.LeftArm, _defaultBodyColor);
+		RightArmColor = Color.FromString(avatarData.Colors.RightArm, _defaultBodyColor);
+		LeftLegColor = Color.FromString(avatarData.Colors.LeftLeg, _defaultBodyColor);
+		RightLegColor = Color.FromString(avatarData.Colors.RightLeg, _defaultBodyColor);
 
 		bool hasTool = false;
 
