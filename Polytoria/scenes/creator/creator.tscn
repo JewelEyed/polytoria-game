@@ -1120,8 +1120,7 @@ current_tab = 0
 tabs_position = 1
 deselect_enabled = true
 
-[node name="Console" type="MarginContainer" parent="GUI/Splitter/Center/BottomTabs/Tabs" unique_id=259802220 node_paths=PackedStringArray("_richLabel", "_searchEdit", "_clearBtn", "_filterBtn")]
-
+[node name="Console" type="MarginContainer" parent="GUI/Splitter/Center/BottomTabs/Tabs" unique_id=259802220 node_paths=PackedStringArray("_richLabel", "_searchEdit", "_clearBtn")]
 custom_minimum_size = Vector2(0, 220)
 layout_mode = 2
 theme_override_constants/margin_left = 8
@@ -1132,7 +1131,6 @@ script = ExtResource("30_bc04q")
 _richLabel = NodePath("VBoxContainer/RichTextLabel")
 _searchEdit = NodePath("VBoxContainer/SearchBar/LineEdit")
 _clearBtn = NodePath("VBoxContainer/SearchBar/ClearBtn")
-_filterBtn = NodePath("VBoxContainer/SearchBar/FilterBtn")
 metadata/_tab_index = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="GUI/Splitter/Center/BottomTabs/Tabs/Console" unique_id=681967966]
@@ -1179,7 +1177,6 @@ icon = ExtResource("22_i1txp")
 expand_icon = true
 
 [node name="ConsoleFilters" parent="GUI/Splitter/Center/BottomTabs/Tabs/Console" unique_id=1370024561 instance=ExtResource("40_console_filters")]
-size = Vector2i(270, 150)
 visible = false
 
 [node name="Right" type="PanelContainer" parent="GUI/Splitter" unique_id=528512110]

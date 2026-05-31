@@ -251,7 +251,7 @@ public partial class GUI3D : Dynamic
 		_mesh.Scale = newSize;
 		base.OnNodeSizeChanged(newSize);
 	}
-
+ 
 	private void UpdateSize()
 	{
 		if (FaceCamera)

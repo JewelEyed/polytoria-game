@@ -74,6 +74,7 @@ public partial class InsertMenuPopup : PopupPanel
 		[new() { Title = "Effects" }] = new()
 		{
 			"Particles",
+			"Outline",
 		},
 		[new() { Title = "Audio" }] = new()
 		{
