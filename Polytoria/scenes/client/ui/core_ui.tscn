@@ -27,7 +27,7 @@
 [ext_resource type="Texture2D" uid="uid://x8rbtcckir1a" path="res://assets/textures/client/ui/indicators/silence.svg" id="20_gmv8i"]
 [ext_resource type="PackedScene" uid="uid://bycaka8x6gyon" path="res://scenes/client/ui/core/debug_console_window.tscn" id="20_yrpeo"]
 [ext_resource type="PackedScene" uid="uid://b8dmrhqpwspyn" path="res://scenes/client/ui/purchase/purchase_prompt.tscn" id="28_gmv8i"]
-[ext_resource type="Texture2D" uid="uid://86t7sgekbev1" path="res://assets/textures/client/cursor/chevron-up.png" id="29_0curs"]
+[ext_resource type="Texture2D" uid="uid://dgrks31ws6ixy" path="res://assets/textures/client/cursor/ctrl-lock/chevron.svg" id="28_tesjd"]
 
 [sub_resource type="Animation" id="Animation_mt8aq"]
 length = 0.001
@@ -289,6 +289,7 @@ CapturePreview = NodePath("Control/Capture")
 PurchasePrompt = NodePath("Control/PurchasePrompt")
 CtrlLockCursor = NodePath("Control/CtrlLockCursor")
 DevWindow = NodePath("Control/DebugConsole")
+CtrlLockCursorsFilepath = "res://assets/textures/client/cursor/ctrl-lock"
 metadata/_edit_horizontal_guides_ = [16.0, 64.0]
 metadata/_edit_vertical_guides_ = [1136.0]
 
@@ -536,8 +537,7 @@ visibility_mode = 1
 layout_mode = 1
 
 [node name="CtrlLockCursor" type="TextureRect" parent="Control" unique_id=1661787608]
-visible = false
-z_index = 100
+z_index = 9
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -552,7 +552,7 @@ grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(16, 16)
 mouse_filter = 2
-texture = ExtResource("29_0curs")
+texture = ExtResource("28_tesjd")
 expand_mode = 1
 stretch_mode = 5
 
